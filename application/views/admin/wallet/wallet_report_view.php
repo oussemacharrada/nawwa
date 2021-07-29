@@ -151,7 +151,7 @@ $all_member=array_merge($user_list,$provider_list);
 											</h2>
 										</td>
 										<td>'.$rows['user_mobile'].'</td>
-										<td>'.$rows['wallet_amt'].'</td>
+										<td>'.currency_conversion($rows['currency_code']).$rows['wallet_amt'].'</td>
 										<td><label class="badge badge-'.$color.'">'.ucfirst($role).'</lable></td>
 									</tr>';
 									} 

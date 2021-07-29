@@ -9,6 +9,7 @@ class payments extends CI_Controller {
 
         parent::__construct();
         $this->load->model('payment_model','payment');
+		$this->load->model('common_model','common_model');
         $this->data['theme'] = 'admin';
         $this->data['model'] = 'payments';
         $this->data['base_url'] = base_url();
@@ -21,6 +22,7 @@ class payments extends CI_Controller {
 
 	public function payment_list()
   {
+	  $this->common_model->checkAdminUserPermission(6);
    extract($_POST);
       $this->data['page'] = 'payment_list';
        if ($this->input->post('form_submit')) 

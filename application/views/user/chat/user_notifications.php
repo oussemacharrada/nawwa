@@ -47,7 +47,7 @@
 
 					<?php } }else{ ?>
 					<div class="notificationlist">
-						<p class="text-center text-danger mt-3">Notification Empty</p>
+						<p class="text-center text-danger mt-3"><?php echo (!empty($user_language[$user_selected]['lg_notification_empty'])) ? $user_language[$user_selected]['lg_notification_empty'] : $default_language['en']['lg_notification_empty']; ?></p>
 					</div>
 				   <?php } ?>
 				   <?php 

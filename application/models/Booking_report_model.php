@@ -6,6 +6,7 @@ class Booking_report_model extends CI_Model
 	public function __construct()
 	{
 		parent::__construct();
+     date_default_timezone_set('Asia/Kolkata');
 	}
 
  
@@ -13,7 +14,7 @@ class Booking_report_model extends CI_Model
 
  public function get_total_bookings(){
 
-                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
+                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -45,7 +46,7 @@ class Booking_report_model extends CI_Model
           }
 
 
-                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
+                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -84,7 +85,7 @@ class Booking_report_model extends CI_Model
 
  public function get_pending_bookings(){
 
-                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
+                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -117,7 +118,7 @@ class Booking_report_model extends CI_Model
           }
 
 
-                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
+                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -157,7 +158,7 @@ class Booking_report_model extends CI_Model
 
  public function get_inprogress_bookings(){
 
-                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
+                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -165,7 +166,7 @@ class Booking_report_model extends CI_Model
                                      $this->db->join('services tab_2','tab_2.id=tab_1.service_id','LEFT');
                                      $this->db->join('users tab_3','tab_3.id=tab_1.user_id','LEFT');
                                      $this->db->join('providers tab_4','tab_4.id=tab_1.provider_id','LEFT');
-                                     $this->db->where('tab_1.status',2);
+                                     $this->db->where('tab_1.status in (2,3,4)');
                                      $this->db->order_by('tab_1.id','DESC');
                                      $returns=$this->db->get()->result_array();
                                 return $returns;
@@ -190,7 +191,7 @@ class Booking_report_model extends CI_Model
           }
 
 
-                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
+                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -198,7 +199,7 @@ class Booking_report_model extends CI_Model
                                      $this->db->join('services tab_2','tab_2.id=tab_1.service_id','LEFT');
                                      $this->db->join('users tab_3','tab_3.id=tab_1.user_id','LEFT');
                                      $this->db->join('providers tab_4','tab_4.id=tab_1.provider_id','LEFT');
-                                     $this->db->where('tab_1.status',2);
+                                     $this->db->where('tab_1.status in (2,3,4)');
                                      if(!empty($service_id)){
                                       $this->db->where('tab_1.service_id',$service_id);
                                      }
@@ -229,7 +230,7 @@ class Booking_report_model extends CI_Model
 
  public function get_complete_bookings(){
 
-                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
+                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -262,7 +263,7 @@ class Booking_report_model extends CI_Model
           }
 
 
-                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
+                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -303,7 +304,7 @@ class Booking_report_model extends CI_Model
 
  public function get_reject_bookings(){
 
-                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on,,tab_1.admin_change_status,tab_1.reject_paid_token,tab_1.admin_reject_comment');
+                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on,,tab_1.admin_change_status,tab_1.reject_paid_token,tab_1.admin_reject_comment');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -337,7 +338,7 @@ class Booking_report_model extends CI_Model
           }
 
 
-                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on,tab_1.admin_change_status,tab_1.reject_paid_token,tab_1.admin_reject_comment');
+                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on,tab_1.admin_change_status,tab_1.reject_paid_token,tab_1.admin_reject_comment');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -378,7 +379,7 @@ class Booking_report_model extends CI_Model
 
  public function get_cancel_bookings(){
 
-                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on,tab_1.admin_change_status,tab_1.reject_paid_token,tab_1.admin_reject_comment');
+                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on,tab_1.admin_change_status,tab_1.reject_paid_token,tab_1.admin_reject_comment');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -412,7 +413,7 @@ class Booking_report_model extends CI_Model
           }
 
 
-                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on,tab_1.admin_change_status');
+                                     $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on,tab_1.admin_change_status');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img');
@@ -451,7 +452,7 @@ class Booking_report_model extends CI_Model
 
   public function get_reject_bookings_by_id($id){
 
-                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on,tab_1.status as payment_status');
+                            $this->db->select('tab_1.id,tab_1.location,tab_1.service_date,tab_1.currency_code,tab_1.amount,tab_1.currency_code,tab_1.from_time,tab_1.to_time,tab_1.notes,tab_1.latitude,tab_1.longitude,tab_1.request_date,tab_1.request_time,tab_1.status,tab_1.reason,tab_1.updated_on,tab_1.status as payment_status');
                                      $this->db->select('tab_2.service_title');
                                      $this->db->select('tab_3.name as user_name,tab_3.mobileno as user_mobile,tab_3.email as user_email,tab_3.profile_img as user_profile_img,tab_3.token as user_token');
                                      $this->db->select('tab_4.name as provider_name,tab_4.mobileno as provider_mobile,tab_4.email as provider_email,tab_4.profile_img as provider_profile_img,tab_4.token as provider_token');
@@ -482,18 +483,26 @@ class Booking_report_model extends CI_Model
                           $provider=$this->get_user_info($user_info->id,$user_info->type);
 
                           if($user_info->type==1){
+							$query = $this->db->query('select * from admin_commission where admin_id=1');
+							$amount = $query->row();
+							$pertage = $amount->commission;	
                             $cash_text="Rejected by Provider and refunded by Admin.";
+							$commission = ($booking['amount']) * $pertage / 100;
+                            $ComAmount = $booking['amount'] - $commission;
                           }else{
                             $cash_text="Rejected by user and refunded by Admin.";
+							$ComAmount = $booking['amount'];
                           }
                           
                           $wallet=$this->get_wallet($provider['token']);
                           
-                          $curren_wallet=$wallet['wallet_amt'];
+                          //$curren_wallet=$wallet['wallet_amt'];
+						  $curren_wallet = get_gigs_currency($wallet['wallet_amt'], $wallet['currency_code'], $booking['currency_code']);
                           
                           /*wallet infos*/
                           
                           $history_pay['token']=$provider['token'];
+						  $history_pay['currency_code']=$booking['currency_code'];
                           $history_pay['user_provider_id']=$provider['id'];
                           $history_pay['type']=$provider['type'];
                           $history_pay['tokenid']=$data['book_id'];
@@ -509,21 +518,35 @@ class Booking_report_model extends CI_Model
                           $history_pay['net_amt']=$booking['amount']*100;
                           $history_pay['amount_refund']=0;
                           $history_pay['current_wallet']=$curren_wallet;
-                          $history_pay['credit_wallet']=($booking['amount']);
+                          $history_pay['credit_wallet']=($ComAmount);
                           $history_pay['debit_wallet']=0;
-                          $history_pay['avail_wallet']=($booking['amount'])+$curren_wallet;
+                          $history_pay['avail_wallet']=($ComAmount)+$curren_wallet;
                           $history_pay['reason']= $cash_text;
                           $history_pay['created_at']=date('Y-m-d H:i:s');
                           
                           if($this->db->insert('wallet_transaction_history',$history_pay)){
+							  if($user_info->type==1){
+								  //Detect commision refund to provider
+									$commissionInsert = [
+											'date' => date('Y:m:d'),
+											'provider' => $booking['provider_id'],
+											'user' => $booking['user_id'],
+											'currency_code' => $booking['currency_code'],
+											'amount' => $booking['amount'],
+											'commission' => $pertage,
+										];
+									$commInsert = $this->db->insert('revenue', $commissionInsert);
+							  }
                           /*update wallet table*/
-                          $wallet_data['wallet_amt']=($booking['amount'])+$curren_wallet;
-                          $wallet_data['updated_on']=utc_date_conversion(date('Y-m-d H:i:s'));
+						  
+                          $wallet_amount = $ComAmount+$curren_wallet;
+                          $wallet_data['wallet_amt']=get_gigs_currency($wallet_amount, $booking['currency_code'], $wallet['currency_code']);
+                          $wallet_data['updated_on']=(date('Y-m-d H:i:s'));
                           $WHERE =array('token'=> $provider['token']);
                           $result=$this->update_wallet($wallet_data,$WHERE);
 
                           $book_h['admin_change_status']=1;
-                          $book_h['updated_on']=utc_date_conversion(date('Y-m-d H:i:s'));
+                          $book_h['updated_on']=(date('Y-m-d H:i:s'));
                           $book_h['reject_paid_token']=$data['token'];
                           $book_h['admin_reject_comment']=$data['favour_comment'];
                           $b_where =array('id'=> $data['book_id']);
@@ -578,7 +601,7 @@ class Booking_report_model extends CI_Model
   public function get_book_info($book_service_id){
 
 
-    $ret=$this->db->select('tab_1.provider_id,tab_1.user_id,tab_1.status,tab_1.amount,tab_2.service_title')->
+    $ret=$this->db->select('tab_1.provider_id,tab_1.user_id,tab_1.status,tab_1.currency_code,tab_1.amount,tab_2.service_title')->
                     from('book_service as tab_1')->
                     join('services as tab_2','tab_2.id=tab_1.service_id','LEFT')->
                     where('tab_1.id',$book_service_id)->limit(1)->
@@ -611,7 +634,7 @@ class Booking_report_model extends CI_Model
 /*wallet information*/
 
 public function get_wallet($token){
-  $val=$this->db->select('id,token,wallet_amt,type')->from('wallet_table')->where('token',$token)->get()->row();
+  $val=$this->db->select('id,token,currency_code,wallet_amt,type')->from('wallet_table')->where('token',$token)->get()->row();
   $wallet=[];
   $setting_currency='';
      $query = $this->db->query("select * from system_settings WHERE status = 1");
@@ -637,8 +660,8 @@ public function get_wallet($token){
       $wallet['token']=$val->token;
       $wallet['type']=$val->type;
       $wallet['wallet_amt']=strval(abs($val->wallet_amt));
-      $wallet['currency']=currency_conversion(settings('currency'));
-      $wallet['currency_code']=$setting_currency;
+      $wallet['currency']=currency_conversion($val->currency_code);
+      $wallet['currency_code']=$val->currency_code;
       $wallet['total_credit']=strval($wallet_tot['total_credit']);
       $wallet['total_debit']=strval($wallet_tot['total_debit']);
    

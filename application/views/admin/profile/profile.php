@@ -30,6 +30,12 @@
 										<label>Username</label>
 										<input type="text" class="form-control" value="<?php echo $details['username']; ?>" disabled>
 									</div>
+									
+									<div class="form-group">
+										<label>Email ID</label>
+										<input type="text" class="form-control" id="adminmail" name="email" value="<?php echo $details['email']; ?>" >
+										<span id="email_error" class="text-danger" ></span>
+									</div>
 									<div class="form-group">
 										<label>Profile Image</label>
 										<div class="media align-items-center">

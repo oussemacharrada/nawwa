@@ -1,14 +1,24 @@
 <?php 
 
 defined('BASEPATH') OR exit('No direct script access allowed.');
-$email_config=$this->db->where('key','mail_config')->from('system_settings')->get()->row_array();
-$email_address=$this->db->where('key','email_address')->from('system_settings')->get()->row_array();
-$email_password=$this->db->where('key','email_password')->from('system_settings')->get()->row_array();
+$CI =& get_instance();
+$email_config=$CI->db->where('key','mail_config')->from('system_settings')->get()->row_array();
+$email_address=$CI->db->where('key','email_address')->from('system_settings')->get()->row_array();
+$email_password=$CI->db->where('key','email_password')->from('system_settings')->get()->row_array();
 
-$smtp_email_address=$this->db->where('key','smtp_email_address')->from('system_settings')->get()->row_array();
-$smtp_email_password=$this->db->where('key','smtp_email_password')->from('system_settings')->get()->row_array();
-$smtp_email_host=$this->db->where('key','smtp_email_host')->from('system_settings')->get()->row_array();
-$smtp_email_port=$this->db->where('key','smtp_email_port')->from('system_settings')->get()->row_array();
+$smtp_email_address=$CI->db->where('key','smtp_email_address')->from('system_settings')->get()->row_array();
+$smtp_email_password=$CI->db->where('key','smtp_email_password')->from('system_settings')->get()->row_array();
+$smtp_email_host=$CI->db->where('key','smtp_email_host')->from('system_settings')->get()->row_array();
+$smtp_email_port=$CI->db->where('key','smtp_email_port')->from('system_settings')->get()->row_array();
+
+// $email_config=$this->db->where('key','mail_config')->from('system_settings')->get()->row_array();
+// $email_address=$this->db->where('key','email_address')->from('system_settings')->get()->row_array();
+// $email_password=$this->db->where('key','email_password')->from('system_settings')->get()->row_array();
+
+// $smtp_email_address=$this->db->where('key','smtp_email_address')->from('system_settings')->get()->row_array();
+// $smtp_email_password=$this->db->where('key','smtp_email_password')->from('system_settings')->get()->row_array();
+// $smtp_email_host=$this->db->where('key','smtp_email_host')->from('system_settings')->get()->row_array();
+// $smtp_email_port=$this->db->where('key','smtp_email_port')->from('system_settings')->get()->row_array();
 if(!isset($email_config)){
 	$email_config="phpmail";
 }

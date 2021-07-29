@@ -231,11 +231,11 @@ array("id"=>7,'value'=>'Cancel')
 										$color='info';
 									}
 									if ($rows['status']==3) {
-										$badge='Provider Completed';
+										$badge='Complete requested by Provider';
 										$color='primary';
 									}
 									if ($rows['status']==4) {
-										$badge='Accepted';
+										$badge='Complete Accepted by User';
 										$color='muted';
 									}
 									if ($rows['status']==5) {
@@ -270,7 +270,7 @@ array("id"=>7,'value'=>'Cancel')
 											</h2>
 										</td>
 										<td>'.$rows['service_title'].'</td>
-										<td>$'.$rows['amount'].'</td>
+										<td>'.currency_conversion($rows['currency_code']).$rows['amount'].'</td>
 										<td><label class="badge badge-'.$color.'">'.ucfirst($badge).'</lable></td>
 										<td>'.$timeBase.'</td>
 									</tr>';

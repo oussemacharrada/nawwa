@@ -7,7 +7,7 @@ class Dashboard_model extends CI_Model {
 
         parent::__construct();
         $this->load->database();
-        date_default_timezone_set('UTC');
+        date_default_timezone_set('Asia/Kolkata');
     }
 
 		public function total_requests(){
@@ -59,6 +59,10 @@ class Dashboard_model extends CI_Model {
 		var $users  = 'users U';
 		var $subscription_details  = 'subscription_details SD';
 		var $subscription  = 'subscription_fee S';
+		var $admincolumn_order = array(null, 'U.username','U.full_name');
+		var $admincolumn_search = array( 'U.username','U.full_name');
+		var $adminorder = array('U.user_id' => 'DESC'); // default order
+		var $administrators  = 'administrators U';
 		
 		private function p_get_datatables_query()
 		{
@@ -281,7 +285,7 @@ class Dashboard_model extends CI_Model {
 
      public function get_bookinglist()
      {
-        $this->db->select("b.*,s.service_title,s.service_image,s.service_amount,s.rating,s.service_image,c.category_name,sc.subcategory_name,p.profile_img,p.mobileno,p.name");
+        $this->db->select("b.*,b.currency_code as currency_code1,s.service_title,s.service_image,s.service_amount,s.rating,s.service_image,c.category_name,sc.subcategory_name,p.profile_img,p.mobileno,p.name");
         $this->db->from('book_service b');
         $this->db->join('services s', 'b.service_id = s.id', 'LEFT');
         $this->db->join('categories c', 'c.id = s.category', 'LEFT');
@@ -305,8 +309,93 @@ class Dashboard_model extends CI_Model {
      }
 
      /*admin dashboard*/
+	 
+	 private function p_get_datatables_adminquery()
+		{
 
-    
+
+			$this->db->select('user_id,username,email,full_name,profile_img');
+			$this->db->from($this->administrators);			
+			$i = 0;
+			foreach ($this->admincolumn_search as $item) // loop column
+				{
+						if($_POST['search']['value']) // if datatable send POST for search
+						{
+
+								if($i===0) // first loop
+								{
+										$this->db->group_start(); // open bracket. query Where with OR clause better with bracket. because maybe can combine with other WHERE with AND.
+										$this->db->like($item, $_POST['search']['value']);
+								}
+								else
+								{
+									$search_val = $_POST['search']['value'];
+									$this->db->or_like($item, $search_val);
+								}
+
+								if(count($this->admincolumn_search) - 1 == $i) //last loop
+										$this->db->group_end(); //close bracket
+						}
+						$i++;
+				}
+
+				if(isset($_POST['order'])) // here order processing
+				{
+						$this->db->order_by($this->admincolumn_order[$_POST['order']['0']['column']], $_POST['order']['0']['dir']);
+				}
+				else if(isset($this->adminorder))
+				{
+						$order = $this->adminorder;
+						$this->db->order_by(key($order), $order[key($order)]);
+				}
+		}
+
+    public function adminuser_filter($username){
+		$this->db->select('U.*');
+		$this->db->from('administrators U');
+		if(!empty($username)){
+			$this->db->where('U.username',$username);
+		}
+		return $this->db->get()->result_array();
+
+	}
+	
+	public function adminusers_list(){
+	      $this->p_get_datatables_adminquery();
+	        if($_POST['length'] != -1)
+	        $this->db->limit($_POST['length'], $_POST['start']);
+	        $query = $this->db->get();
+	        return $query->result();
+	  }
+	  
+	  public function get_adminusers_list(){
+	  	return $this->db->get('administrators')->result_array();
+	  }
+	    public function get_adminusers_filter($username){         
+
+          if(!empty($username)){
+            $this->db->where('username=',$username);
+          }           
+          $result=$this->db->get('administrators')->result_array();
+         return $result;
+
+        }
+		
+		 public function adminusers_list_all(){
+	    $this->db->from($this->administrators);
+	        return $this->db->count_all_results();
+	  }
+
+	  public function adminusers_list_filtered(){
+
+	        $this->p_get_datatables_adminquery();
+	        $query = $this->db->get();
+	        return $query->num_rows();
+	  }
+	  public function get_adminuser_details($id){
+	$result=$this->db->where('user_id',$id)->get('administrators')->row_array();
+	return $result;
+}
 
 
 }

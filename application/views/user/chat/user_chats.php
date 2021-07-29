@@ -3,7 +3,7 @@
          <div class="row justify-content-center">
             <div class="col-lg-12">
                <div class="dashboradsec">
-                  <h3 class="mb-4">Chats</h3>
+                  <h3 class="mb-4"><?php echo (!empty($user_language[$user_selected]['lg_chats'])) ? $user_language[$user_selected]['lg_chats'] : $default_langouage['en']['lg_chats']; ?></h3>
                </div>
 
 
@@ -82,7 +82,7 @@
                                 </div>
                                 <div class="user_info">
                                     <span><strong id="receiver_name"></strong></span>
-                                    <p class="mb-0">Messages</p>
+                                    <p class="mb-0"><?php echo (!empty($user_language[$user_selected]['lg_messages'])) ? $user_language[$user_selected]['lg_messages'] : $default_language['en']['lg_messages']; ?></p>
                                 </div>
                             </div>
                         </div>

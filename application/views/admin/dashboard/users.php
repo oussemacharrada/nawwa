@@ -91,7 +91,8 @@
                                         <th>Email</th>
                                         <th>Contact No</th>
                                         <th>Signup Date</th>
-                                        <th>Last Login</th>
+										<th>Last Login</th>
+										<th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -101,9 +102,11 @@
 										foreach ($lists as $rows) {
 										if($rows['status']==1) {
 											$val='checked';
+											$tag='data-toggle="tooltip" title="Click to Deactivate User ..!"';
 										}
 										else {
 											$val='';
+											$tag='data-toggle="tooltip" title="Click to Activate User ..!"';
 										}
 										$profile_img = $rows['profile_img'];
 										if(empty($profile_img)){
@@ -129,6 +132,13 @@
 										<td>'.$rows['mobileno'].'</td>
 										<td>'.$rows['created_at'].'</td>
 										<td>'.$rows['last_login'].'</td>
+										<td><div '.$tag.'>
+												<div class="status-toggle">
+													<input '.$attr.' disabled id="status_'.$rows['id'].'" class="check change_Status_user1" data-id="'.$rows['id'].' type="checkbox" '.$val.'>
+													<label for="status_'.$rows['id'].'" class="checktoggle">checkbox</label>
+												</div>
+											</div>
+											</td>
 										</tr>';
 										}
                                     }

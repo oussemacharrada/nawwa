@@ -8,7 +8,7 @@ class Dashboard extends CI_Controller {
   public function __construct() {
 
     parent::__construct();
-
+    error_reporting(0);
     if(empty($this->session->userdata('id'))){
       redirect(base_url());
     }
@@ -20,9 +20,16 @@ class Dashboard extends CI_Controller {
     $this->load->model('service_model','service');
     $this->load->model('home_model','home');
     $this->load->model('Api_model','api');
+	 $this->load->model('Stripe_model');
 
           // Load pagination library 
+		   $this->load->library('paypal_lib');
     $this->load->library('ajax_pagination'); 
+	$this->load->helper('form');
+        $this->data['csrf'] = array(
+	    'name' => $this->security->get_csrf_token_name(),
+	    'hash' => $this->security->get_csrf_hash()
+	    );
 
         // Load post model 
     $this->load->model('booking'); 
@@ -30,6 +37,29 @@ class Dashboard extends CI_Controller {
 
         // Per page limit 
     $this->perPage = 6; 
+    
+    $default_language_select = default_language();
+
+        if ($this->session->userdata('user_select_language') == '') {
+            $this->data['user_selected'] = $default_language_select['language_value'];
+        } else {
+            $this->data['user_selected'] = $this->session->userdata('user_select_language');
+        }
+
+        $this->data['active_language'] = $active_lang = active_language();
+
+        $lg = custom_language($this->data['user_selected']);
+
+        $this->data['default_language'] = $lg['default_lang'];
+
+        $this->data['user_language'] = $lg['user_lang'];
+
+        $this->user_selected = (!empty($this->data['user_selected'])) ? $this->data['user_selected'] : 'en';
+
+        $this->default_language = (!empty($this->data['default_language'])) ? $this->data['default_language'] : '';
+
+        $this->user_language = (!empty($this->data['user_language'])) ? $this->data['user_language'] : '';
+        
   }
 
   
@@ -54,20 +84,338 @@ class Dashboard extends CI_Controller {
    $this->load->vars($this->data);
    $this->load->view($this->data['theme'].'/template');  
  }
- public function user_wallet()
+ 
+  public function userchangepassword()
  {
-   $this->data['page'] = 'user_wallet';
-
-   $this->data['wallet']=$this->api->get_wallet($this->session->userdata('chat_token'));
-   $this->data['wallet_history']=$this->api->get_wallet_history_info($this->session->userdata('chat_token'));
+   $this->data['page'] = 'user_change_password';
+   $this->data['profile']=$this->service->get_profile($this->session->userdata('id'));
+   //$this->data['wallet']=$this->api->get_wallet($this->session->userdata('chat_token'));
+   //$this->data['wallet_history']=$this->api->get_wallet_history_info($this->session->userdata('chat_token'));
    $this->load->vars($this->data);
    $this->load->view($this->data['theme'].'/template');  
  }
+ 
+	public function prochangepassword()
+ {
+   $this->data['page'] = 'provider_change_password';
+   $user_id       = $this->session->userdata('id');
+   $this->data['profile']=$this->db->where('id', $user_id)->get('providers')->row_array();
+   //$this->data['wallet']=$this->api->get_wallet($this->session->userdata('chat_token'));
+   //$this->data['wallet_history']=$this->api->get_wallet_history_info($this->session->userdata('chat_token'));
+   $this->load->vars($this->data);
+   $this->load->view($this->data['theme'].'/template');  
+ }
+ 
+ 
+public function checkuserpwd()
+ {
+	 
+		$user_id       = $this->session->userdata('id');
+		$user          = $this->db->where('id', $user_id)->where('password', md5($this->input->post('current_password')))->get('users')->row_array();
+		if(!empty($user))
+		{
+			echo 1;
+		}
+		else
+		{
+			echo 0;
+		}
+ }
+ 
+ public function checkproviderpwd()
+ {
+	 
+		$user_id       = $this->session->userdata('id');
+		$user          = $this->db->where('id', $user_id)->where('password', md5($this->input->post('current_password')))->get('providers')->row_array();
+		if(!empty($user))
+		{
+			echo 1;
+		}
+		else
+		{
+			echo 0;
+		}
+ }
+ 
+ 
+ 
+ 
+ 
+ public function update_user_password() {
+        if ($this->input->post()) {
+            removeTag($this->input->post());
+            $user_id = $this->session->userdata('id');
+            $confirm_password = $this->input->post('confirm_password');
+            //$current_password = $this->input->post('current_password');
+			$table_data=array("password"=>md5($confirm_password));
+			$this->db->where('id',$user_id);                
+if($this->db->update('users', $table_data))
+{
+	$this->session->set_flashdata('success_message','Password changed successfully');    
+    redirect(base_url()."change-password");   
+ 
+    
+}
+else
+{
+	$this->session->set_flashdata('error_message','Something wrong, Please try again');
+    redirect(base_url()."change-password");   
+}
+
+            
+        }
+      // redirect(base_url('admin-profile'));
+    }
+	
+	
+	 
+ public function update_provider_password() {
+        if ($this->input->post()) {
+            removeTag($this->input->post());
+            $user_id = $this->session->userdata('id');
+            $confirm_password = $this->input->post('confirm_password');
+            //$current_password = $this->input->post('current_password');
+			$table_data=array("password"=>md5($confirm_password));
+			$this->db->where('id',$user_id);                
+if($this->db->update('providers', $table_data))
+{
+	$this->session->set_flashdata('success_message','Password changed successfully');    
+    redirect(base_url()."provider-change-password");   
+ 
+    
+}
+else
+{
+	$this->session->set_flashdata('error_message','Something wrong, Please try again');
+    redirect(base_url()."provider-change-password");   
+}
+
+            
+        }
+      // redirect(base_url('admin-profile'));
+    }
+	
+	
+ 
+ 
+ public function user_wallet()
+ {
+   $this->data['page'] = 'user_wallet';
+  $user_id=$this->session->userdata('id');
+   $this->data['wallet']=$this->api->get_wallet($this->session->userdata('chat_token'));
+   $this->data['wallet_history']=$this->api->get_wallet_history_info($this->session->userdata('chat_token'));
+   $this->data['user_details']=$user=$this->db->where('users.id',$user_id)->join('user_address','user_address.user_id=users.id','left')->get('users')->row_array();
+   $this->data['paypal_gateway']=settingValue('paypal_gateway');
+   $this->data['braintree_key']=settingValue('braintree_key');
+   $razor_option=settingValue('razor_option');
+  
+   
+   //echo "<pre>";print_r($razorpay_apikey);exit;
+   
+   	if($razor_option == 1){
+		
+		 $this->data['razorpay_apikey']=settingValue('razorpay_apikey');
+   $this->data['razorpay_apisecret']=settingValue('razorpay_apisecret');
+	}else if($razor_option == 2){
+		 $this->data['razorpay_apikey']=settingValue('live_razorpay_apikey');
+   $this->data['razorpay_apisecret']=settingValue('live_razorpay_secret_key');
+	}
+   
+  
+   
+    if(!empty($user['state_id'])){
+      $this->data['states']=$this->db->where('id',$user['state_id'])->get('state')->row()->name;
+    }
+    if(!empty($user['state_id'])){
+      $this->data['state']=$this->db->where('id',$user['state_id'])->get('state')->row()->name;
+    }
+    if(!empty($user['country_id'])){
+      $this->data['country']=$this->db->where('id',$user['country_id'])->get('country_table')->row()->country_code;
+    }
+    if(!empty($user['city_id'])){
+      $this->data['city']=$this->db->where('id',$user['city_id'])->get('city')->row()->name;
+    }
+   $this->load->vars($this->data);
+   $this->load->view($this->data['theme'].'/template');  
+ }
+ 
+ 
+  public function paytab_payment()
+    {
+		//echo "hi";exit;
+        removeTag($this->input->get());
+        $params = $this->input->get();//
+        if (!empty($params)) {
+            $amount        = $params['wallet_amt'];
+            $user_id       = $this->session->userdata('id');
+            $user          = $this->db->where('id', $user_id)->get('users')->row_array();
+            $user_name     = $user['name'];
+            $user_token    = $user['token'];
+            $currency_type =  settings('currency');
+			$this->paytabs_payments($amount, $user_id, $user_name, $currency_type, $user_token);
+          
+        }
+    }
+	
+	public function paytabs_payments($amount, $user_id, $g_name, $currency_type, $user_token)
+    {
+		
+		$paytab_option = settingValue('paytab_option');
+			if($paytab_option == 1){
+		
+		 $paytabemail=settingValue('sandbox_email');
+   $paytabsecret=settingValue('sandbox_secretkey');
+	}else if($paytab_option == 2){
+		 $paytabemail=settingValue('email');
+   $paytabsecret=settingValue('secretkey');
+	}
+	
+	//echo "<pre>";print_r($paytabsecret);exit;
+		// $this->data['razorpay_apikey']=settingValue('razorpay_apikey');
+		// $this->data['razorpay_apisecret']=settingValue('razorpay_apisecret');
+   
+        $ip          = isset($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+        $USERID      = $this->session->userdata('id');
+        $userdetails = $this->db->query('select m.email,m.name,m.mobileno,a.address,a.country_id,a.state_id,a.city_id,a.pincode,ci.name as city ,c.country_code,c.country_name,s.name as state_name from users as m 
+     LEFT JOIN user_address as a on a.user_id=m.id
+	 LEFT JOIN city as ci on ci.id=a.city_id
+     LEFT JOIN country_table as c on c.id=a.country_id
+     LEFT JOIN state as s on s.id=a.state_id
+     WHERE m.id=' . $USERID . '')->row_array();
+	 
+	
+        $details     = array(
+            "merchant_email" => $paytabemail,
+            "secret_key" => $paytabsecret,
+            "site_url" => base_url($this->data['theme']),
+            "return_url" => base_url($this->data['theme'] . '/dashboard/paytabs_success/'),
+            "title" => $g_name,
+            "cc_first_name" => $userdetails['name'],
+            "cc_last_name" => "Not Mentioned",
+            "cc_phone_number" => !empty($userdetails['mobileno']) ? $userdetails['mobileno'] : '0000',
+            "phone_number" => !empty($userdetails['mobileno']) ? $userdetails['mobileno'] : '0000',
+            "email" => $userdetails['email'],
+            "products_per_title" => $g_name,
+            "unit_price" => $amount,
+            "quantity" => "1",
+            "other_charges" => "0",
+            "amount" => $amount,
+            "discount" => "0",
+            "currency" => $currency_type,
+            "reference_no" => $USERID,
+            "ip_customer" => $ip,
+            "ip_merchant" => $ip,
+            "csrf_token_name" => $this->security->get_csrf_hash(),
+			//$this->security->get_csrf_token_name()=>$this->security->get_csrf_hash(),
+            "billing_address" => !empty($userdetails['address']) ? $userdetails['address'] : 'Not Mentioned',
+            "city" => !empty($userdetails['city']) ? $userdetails['city'] : 'Not Mentioned',
+            "state" => !empty($userdetails['state_name']) ? $userdetails['state_name'] : 'Not Mentioned',
+            "postal_code" => !empty($userdetails['pincode']) ? $userdetails['pincode'] : 'Not Mentioned',
+            "country" => !empty($userdetails['country_code']) ? $userdetails['country_code'] : 'IND',
+            "shipping_first_name" => $userdetails['name'],
+            "shipping_last_name" => "Not Mentioned",
+            "address_shipping" => !empty($userdetails['address']) ? $userdetails['address'] : 'Not Mentioned',
+            "state_shipping" => !empty($userdetails['state_name']) ? $userdetails['state_name'] : 'Not Mentioned',
+            "city_shipping" => !empty($userdetails['city']) ? $userdetails['city'] : 'Not Mentioned',
+            "postal_code_shipping" => !empty($userdetails['pincode']) ? $userdetails['pincode'] : 'Not Mentioned',
+            "country_shipping" => !empty($userdetails['country_code']) ? $userdetails['country_code'] : 'IND',
+            "msg_lang" => "English",
+            "cms_with_version" => "CodeIgniter 3.1.9"
+        );
+		
+		// echo "<pre>";print_r($details);exit;
+        $ch          = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://www.paytabs.com/apiv2/create_pay_page");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        // In real life you should use something like:
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($details));
+        // Receive server response ...
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        $info     = curl_getinfo($ch);
+        if (curl_errno($ch)) {
+            $error_msg = curl_error($ch);
+        }
+        curl_close($ch);
+        $pay_tabs_response = json_decode($response);
+        if (!empty($pay_tabs_response->payment_url)) {
+            redirect(urldecode($pay_tabs_response->payment_url));
+        } else {
+            $message = (!empty($this->user_language[$this->user_selected]['lg_something_went_wrong'])) ? $this->user_language[$this->user_selected]['lg_something_went_wrong'] : $this->default_language['en']['lg_something_went_wrong'];
+            $this->session->set_flashdata('msg_error', $message);
+            redirect('user-wallet');
+        }
+    }
+    public function paytabs_success()
+    {
+		
+		
+		//print_r($this->security->get_csrf_token_name());//exit;
+		//print_r($this->security->get_csrf_hash());exit;
+		// echo "hi";exit;
+        //removeTag($this->input->post());
+		$paytab_option = settingValue('paytab_option');
+			if($paytab_option == 1){
+		
+		 $paytabemail=settingValue('sandbox_email');
+   $paytabsecret=settingValue('sandbox_secretkey');
+	}else if($paytab_option == 2){
+		 $paytabemail=settingValue('email');
+   $paytabsecret=settingValue('secretkey');
+	}
+        $paytabInfo = $this->input->post();//echo "<pre>";print_r($this->input->post());exit;
+        if (!empty($paytabInfo)) {
+            $details = array(
+                "merchant_email" => $paytabemail,
+                "secret_key" => $paytabsecret,
+                "payment_reference" => $paytabInfo['payment_reference']
+            );
+			
+			//echo "<pre>";print_r($details);exit;
+            $ch      = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://www.paytabs.com/apiv2/verify_payment");
+            curl_setopt($ch, CURLOPT_POST, 1);
+            // In real life you should use something like:
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($details));
+            // Receive server response ...
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($ch);
+            $info     = curl_getinfo($ch);
+            curl_close($ch);
+            $pay_tabs_response = json_decode($response);
+			//echo "<pre>";print_r($pay_tabs_response);exit;
+			
+            if ($pay_tabs_response->response_code == '100') {
+                if (!empty($pay_tabs_response->reference_no)) {
+                    $user    = $this->Stripe_model->get_user_info($pay_tabs_response->reference_no);
+                    $user_id = $pay_tabs_response->reference_no;
+                    $txn_id  = $pay_tabs_response->transaction_id;
+                    $amt     = $pay_tabs_response->amount;
+                    $result  = $this->Stripe_model->user_wallet_history_flow($pay_tabs_response->reference_no, $txn_id, $amt);
+                    if ($result == true) {
+                        $message = (!empty($this->user_language[$this->user_selected]['lg_wallet_amount_add_wallet'])) ? $this->user_language[$this->user_selected]['lg_wallet_amount_add_wallet'] : $this->default_language['en']['lg_wallet_amount_add_wallet'];
+                        $this->session->set_flashdata('msg_success', $message);
+                        redirect('user-wallet');
+                    } else {
+                        $message = (!empty($this->user_language[$this->user_selected]['lg_something_went_wrong'])) ? $this->user_language[$this->user_selected]['lg_something_went_wrong'] : $this->default_language['en']['lg_something_went_wrong'];
+                        $this->session->set_flashdata('msg_error', $message);
+                        redirect('user-wallet');
+                    }
+                }
+            } else {
+                $message = (!empty($this->user_language[$this->user_selected]['lg_something_went_wrong'])) ? $this->user_language[$this->user_selected]['lg_something_went_wrong'] : $this->default_language['en']['lg_something_went_wrong'];
+                $this->session->set_flashdata('msg_error', $message);
+                redirect('user-wallet');
+            }
+        }
+    }
+ 
+ 
  public function user_payment()
  { 
    $this->data['page'] = 'user_payment';
 
-   $this->data['services'] = $this->db->where('b.user_id',$this->session->userdata('id'))->where_in('b.status',[5,6,7])->from('book_service as b')->join('users as u','u.id=b.user_id')->join('services s','s.id=b.service_id')->select('b.*,u.*,s.service_title,s.service_image,b.status as booking_status')->order_by('b.id','desc')->get()->result_array();
+   $this->data['services'] = $this->db->where('b.user_id',$this->session->userdata('id'))->where_in('b.status',[5,6,7])->from('book_service as b')->join('users as u','u.id=b.user_id')->join('services s','s.id=b.service_id')->select('b.*,b.currency_code as currency_code1,u.*,s.service_title,s.service_image,b.status as booking_status')->order_by('b.id','desc')->get()->result_array();
 
    $this->load->vars($this->data);
    $this->load->view($this->data['theme'].'/template');  
@@ -449,8 +797,25 @@ public function provider_payment()
 }  
 public function provider_subscription()
 {
+	$user_id = $this->session->userdata('id');
  $this->data['page'] = 'provider_subscription';
-
+  $this->data['user_details']=$user=$this->db->where('providers.id',$user_id)->join('provider_address','provider_address.provider_id=providers.id','left')->get('providers')->row_array();
+   $this->data['paypal_gateway']=settingValue('paypal_gateway');
+   $this->data['braintree_key']=settingValue('braintree_key');
+ $razor_option=settingValue('razor_option');
+  
+   
+   //echo "<pre>";print_r($razorpay_apikey);exit;
+   
+   	if($razor_option == 1){
+		
+		 $this->data['razorpay_apikey']=settingValue('razorpay_apikey');
+   $this->data['razorpay_apisecret']=settingValue('razorpay_apisecret');
+	}else if($razor_option == 2){
+		 $this->data['razorpay_apikey']=settingValue('live_razorpay_apikey');
+   $this->data['razorpay_apisecret']=settingValue('live_razorpay_secret_key');
+	}
+	
  $this->data['wallet']=$this->api->get_wallet($this->session->userdata('chat_token'));
  $this->data['wallet_history']=$this->api->get_wallet_history_info($this->session->userdata('chat_token'));
  $this->load->vars($this->data);
@@ -866,6 +1231,701 @@ return $image_url;
  * Add clean-up code here
  */
 } 
+
+//paramesh
+	public function razor_payment_success()
+    { 
+		//echo "hi";exit;
+		//removeTag($this->input->get());
+		$user_id       = $this->session->userdata('id');
+		$user          = $this->db->where('id', $user_id)->get('users')->row_array();
+		$params = $this->input->get();
+		
+		//echo "<pre>";print_r($params);exit;
+			$token=$this->session->userdata('chat_token');
+		$user_name     = $user['name'];
+		$user_token    = $user['token'];
+		$currency_type = $user['currency_code'];	
+		
+		$amt        = $params['totalAmount'];
+		
+		$wallet = $this->db->where('user_provider_id', $user_id)->get('wallet_table')->row_array();
+		$wallet_amt = $wallet['wallet_amt'];
+		if($wallet_amt){
+				$current_wallet = $wallet_amt;
+			}else{
+				$current_wallet = $amt;
+			}
+			
+		$history_pay['token']=$user_token;
+		$history_pay['currency_code'] =  settings('currency');
+		$history_pay['user_provider_id']=$user_id;
+		$history_pay['type']='2';
+		$history_pay['tokenid']=$token;
+		$history_pay['payment_detail']="Razorpay";
+		$history_pay['charge_id']=1;
+		//$history_pay['transaction_id']=$pay_transaction;
+		$history_pay['exchange_rate']=0;
+		$history_pay['paid_status']="pass";
+		$history_pay['cust_id']="self";
+		$history_pay['card_id']="self";
+		$history_pay['total_amt']=$amt;
+		$history_pay['fee_amt']=0;
+		$history_pay['net_amt']=$amt;
+		$history_pay['amount_refund']=0;
+		$history_pay['current_wallet']=$current_wallet;
+		$history_pay['credit_wallet']=$amt;
+		$history_pay['debit_wallet']=0;
+		$history_pay['avail_wallet']=$amt + $wallet_amt;
+		$history_pay['reason']=TOPUP;
+		$history_pay['created_at']=date('Y-m-d H:i:s');
+		
+		
+		
+			if($this->db->insert('wallet_transaction_history',$history_pay)){
+				
+				$this->db->where('user_provider_id', $user_id)->update('wallet_table', array(
+					'currency_code' => 'INR',
+					'wallet_amt' => $amt+$current_wallet
+				));
+				echo 0;                
+			}else{
+				echo 1;                
+			}					
+		
+    }
+	public function razorthankyou(){
+		$result = $_REQUEST['res'];
+		if ($result == 0) {
+			$message = (!empty($this->user_language[$this->user_selected]['lg_wallet_amount_add_wallet'])) ? $this->user_language[$this->user_selected]['lg_wallet_amount_add_wallet'] : $this->default_language['en']['lg_wallet_amount_add_wallet'];
+			$this->session->set_flashdata('msg_success', $message);
+			redirect('user-wallet');
+		} else {
+			$message = (!empty($this->user_language[$this->user_selected]['lg_something_went_wrong'])) ? $this->user_language[$this->user_selected]['lg_something_went_wrong'] : $this->default_language['en']['lg_something_went_wrong'];
+			$this->session->set_flashdata('message', $message);
+			redirect('user-wallet');
+		}
+	}
+	
+	public function razorpay_details()
+    {
+		//echo "hi";exit;
+        removeTag($this->input->post());
+        $params        = $this->input->post();
+        $user_id       = $this->session->userdata('id');
+		
+		  $query = $this->db->query("select * from system_settings WHERE status = 1");
+        $result = $query->result_array();
+        if(!empty($result))
+        { 
+            foreach($result as $data1){
+
+    
+                if($data1['key'] == 'razorpay_apikey'){
+                  $apikey = $data1['value'];
+                }
+    
+                if($data1['key'] == 'razorpay_secret_key'){
+                  $apisecret = $data1['value'];
+                }
+
+    
+                if($data1['key'] == 'live_razorpay_apikey'){
+                  $apikey = $data1['value'];
+                }
+    
+                if($data1['key'] == 'live_razorpay_secret_key'){
+                  $apisecret = $data1['value'];
+                }
+		   
+           }
+        }
+		
+		
+		// $razor_option = settingValue('razor_option');
+		// if($razorpay_option == 1){			
+			// $apikey = settingValue('razorpay_apikey');
+			// $apisecret = settingValue('razorpay_secret_key');
+		// }else if($razorpay_option == 2){
+			// $apikey = settingValue('live_razorpay_apikey');
+			// $apisecret = settingValue('live_razorpay_secret_key');
+		// }
+        $user_currency = 'INR';
+        if (!empty($params)) { 
+			$url = "https://api.razorpay.com/v1/contacts";
+			$unique = strtoupper(uniqid());
+			$data   = ' {
+			  "name":"'.$params['name'].'",
+			  "email":"'.$params['email'].'",
+			  "contact":"'.$params['contact'].'",
+			  "type":"employee",
+			  "reference_id":"'.$unique.'",
+			  "notes":{}
+			}';
+			
+			$ch     = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_USERPWD, $apikey . ":" . $apisecret);
+			$headers = array(
+				'Content-Type:application/json'
+			);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			$result = curl_exec($ch);
+			
+			if (curl_errno($ch)) {
+				$result = 'Error:' . curl_error($ch);
+				echo json_encode(array(
+                    'status' => false,
+                    'msg' => $result
+                ));
+			}
+			
+			
+			$results = json_decode($result);
+			$user_id       = $this->session->userdata('id');
+			$cnotes = $results->notes;
+			$serializedcnotes = serialize($cnotes);
+			$contact_data = array(
+				'user_id' => $user_id,
+				'rp_contactid' => $results->id,
+				'entity' => $results->entity,
+				'name' => $results->name,
+				'contact' => $results->contact,
+				'email' => $results->email,
+				'type' => $results->type,
+				'reference_id' => $results->reference_id,
+				'batch_id' => $results->batch_id,
+				'active' => $results->active,
+				'accountnumber' => $params['accountnumber'],
+				'mode' => $params['mode'],
+				'purpose' => $params['purpose'],
+				'notes' => $serializedcnotes,
+				'created_at' => $results->created_at
+			);
+			
+			
+			$createcontact = $this->db->insert('razorpay_contact', $contact_data);
+			if(!empty($createcontact)){
+				$faurl = "https://api.razorpay.com/v1/fund_accounts";
+				$faunique = strtoupper(uniqid());
+				$fadata   = ' {
+				  "contact_id": "'.$results->id.'",
+				  "account_type": "bank_account",
+				  "bank_account": {
+					"name": "'.$params['bank_name'].'",
+					"ifsc": "'.$params['ifsc'].'",
+					"account_number":"'.$params['accountnumber'].'"
+				  }
+				}';
+				
+				
+								
+				$fach     = curl_init();
+				curl_setopt($fach, CURLOPT_URL, $faurl);
+				curl_setopt($fach, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($fach, CURLOPT_POSTFIELDS, $fadata);
+				curl_setopt($fach, CURLOPT_POST, 1);
+				curl_setopt($fach, CURLOPT_USERPWD, $apikey . ":" . $apisecret);
+				$faheaders = array(
+					'Content-Type:application/json'
+				);
+				curl_setopt($fach, CURLOPT_HTTPHEADER, $faheaders);
+				$faresult = curl_exec($fach);
+				
+				if (curl_errno($fach)) {
+					$faresult = 'Error:' . curl_error($fach);
+					echo json_encode(array(
+						'status' => false,
+						'msg' => $faresult
+					));
+				}
+				$faresults = json_decode($faresult);
+				
+				$fa_data = array(
+					'fund_account_id' => $faresults->id,
+					'entity' => $faresults->entity,
+					'contact_id' => $faresults->contact_id,
+					'account_type' => $faresults->account_type,
+					'ifsc' => $faresults->bank_account->ifsc,
+					'bank_name' => $faresults->bank_account->bank_name,
+					'name' => $faresults->bank_account->name,
+					'account_number' => $faresults->bank_account->account_number,
+					'active' => $faresults->active,
+					'batch_id' => $faresults->batch_id,
+					'created_at' => $faresults->created_at
+				);
+				
+				$facreatecontact = $this->db->insert('razorpay_fund_account', $fa_data);
+				
+				if($facreatecontact){
+					$purl = "https://api.razorpay.com/v1/payouts";
+					$punique = strtoupper(uniqid());
+					$pdata   = ' {
+					  "account_number": "2323230032510196",
+					  "fund_account_id": "'.$faresults->id.'",
+					  "amount": "'.$params['amount'].'",
+					  "currency": "INR",
+					  "mode": "'.$params['mode'].'",
+					  "purpose": "'.$params['purpose'].'",
+					  "queue_if_low_balance": true,
+					  "reference_id": "'.$punique.'",
+					  "narration": "",
+					  "notes": {}
+					}';
+					
+					$pch     = curl_init();
+					curl_setopt($pch, CURLOPT_URL, $purl);
+					curl_setopt($pch, CURLOPT_RETURNTRANSFER, 1);
+					curl_setopt($pch, CURLOPT_POSTFIELDS, $pdata);
+					curl_setopt($pch, CURLOPT_POST, 1);
+					curl_setopt($pch, CURLOPT_USERPWD, $apikey . ":" . $apisecret);
+					$pheaders = array(
+						'Content-Type:application/json'
+					);
+					curl_setopt($pch, CURLOPT_HTTPHEADER, $pheaders);
+					$presult = curl_exec($pch);
+					
+					if (curl_errno($pch)) {
+						$presult = 'Error:' . curl_error($pch);						
+						echo json_encode(array(
+							'status' => false,
+							'msg' => $presult
+						));
+					}
+					$presults = json_decode($presult);
+					
+					$pydata = array(
+						'payout_id' => $presults->id,
+						'entity' => $presults->entity,
+						'fund_account_id' => $presults->fund_account_id,
+						'amount' => $presults->amount,
+						'currency' => $presults->currency,
+						'fees' => $presults->fees,
+						'tax' => $presults->tax,
+						'status' => $presults->status,
+						'utr' => $presults->utr,
+						'mode' => $presults->mode,
+						'purpose' => $presults->purpose,						
+						'reference_id' => $presults->reference_id,
+						'narration' => $presults->narration,
+						'batch_id' => $presults->batch_id,
+						'failure_reason' => $presults->failure_reason,
+						'created_at' => $presults->created_at
+					);
+					$payouts = $this->db->insert('razorpay_payouts', $pydata);
+					if($payouts){
+						$wdata = array(
+							'user_id' => $user_id,
+							'amount' => $presults->amount,
+							'currency_code' => $presults->currency,
+							'transaction_status' => 1,
+							'transaction_date' => date('Y-m-d'),
+							'request_payment' => 'RazorPay',
+							'status' => 1,
+							'created_by' => $user_id,
+							'created_at' => $presults->created_at
+						);
+						
+						
+						$payoutins = $this->db->insert('wallet_withdraw', $wdata);
+						if($payoutins){
+							$amount        = $presults->amount;
+							$user_id       = $this->session->userdata('id');
+							$user          = $this->db->where('id', $user_id)->get('providers')->row_array();
+							$user_name     = $user['name'];
+							$user_token    = $user['token'];
+							$currency_type =  settings('currency');
+							$wallet = $this->db->where('user_provider_id', $user_id)->where('type', 1)->get('wallet_table')->row_array();
+							$wallet_amt = $wallet['wallet_amt'];//echo json_encode($wallet_amt);exit;
+							$history_pay['token']=$user_token;
+							$history_pay['user_provider_id']=$user_id;
+							$history_pay['currency_code']='INR';
+							$history_pay['credit_wallet'] = 0;
+							$history_pay['debit_wallet'] = $amount;
+							
+							$history_pay['transaction_id']=$presults->id;
+							$history_pay['paid_status']='1';
+							$history_pay['total_amt']=$presults->amount;
+							if($wallet_amt){
+								$current_wallet = $wallet_amt-$amount;
+							}else{
+								$current_wallet = $amount;
+							}
+							$history_pay['current_wallet']=$wallet_amt;
+							$history_pay['avail_wallet'] = $current_wallet;
+							$history_pay['reason']='Withdrawn Wallet Amt';
+							$history_pay['created_at']=date('Y-m-d H:i:s');
+							if($this->db->insert('wallet_transaction_history',$history_pay)){								
+								$this->db->where('user_provider_id', $user_id)->update('wallet_table', array(
+									'currency_code' => 'INR',
+									'wallet_amt' => $current_wallet
+								));								               
+							}
+							$message = "Amount Withdrawn Successfully";
+							echo json_encode(array(
+								'status' => true,
+								'msg' => $message
+							));
+						}else{
+							$message = "Payout details not Inserted";
+							echo json_encode(array(
+								'status' => false,
+								'msg' => $message
+							));
+						}
+					}else{
+						$message = "Payout details not Inserted";
+						echo json_encode(array(
+							'status' => false,
+							'msg' => $message
+						));
+					}
+				} 
+			}
+        }else{
+			$message = (!empty($this->user_language[$this->user_selected]['lg_something_went_wrong'])) ? $this->user_language[$this->user_selected]['lg_something_went_wrong'] : $this->default_language['en']['lg_something_went_wrong'];
+            echo json_encode(array(
+                    'status' => false,
+                    'msg' => $message
+                ));
+		}
+    }
+	
+	
+	
+	
+	public function bank_details()
+    {
+        removeTag($this->input->post());
+        $params        = $this->input->post();
+        $user_id       = $this->session->userdata('id');
+        $user_currency = 'INR';
+        if (!empty($params)) {
+            $check_bank = $this->db->where('user_id', $user_id)->get('bank_account')->num_rows();
+            $user_det   = $this->db->where('id', $user_id)->get('providers')->row_array();
+            $data       = array(
+                'user_id' => $user_id,
+                'account_number' => $params['account_no'],
+                'account_holder_name' => $user_det['name'],
+                'bank_name' => $params['bank_name'],
+                'bank_address' => $params['bank_address'],
+                'sort_code' => $params['sort_code'],
+                'routing_number' => $params['routing_number'],
+                'account_ifsc' => $params['ifsc_code'],
+                'pancard_no' => $params['pancard_no'],
+                'paypal_account' => $params['paypal_id'],
+                'paypal_email_id' => $params['paypal_email_id']
+            );
+            if ($check_bank > 0) {
+                $result = $this->db->where('user_id', $user_id)->update('stripe_bank_details', $data);
+            } else {
+                $result = $this->db->insert('stripe_bank_details', $data);
+            }
+            if ($result == true) {
+                $wallet_data = array(
+                    'user_id' => $user_id,
+                    'amount' => $params['amount'],
+                    'currency_code' => $user_currency,
+                    'status' => 1,
+                    'transaction_status' => 0,
+                    'request_payment' => $params['payment_type'],
+                    'created_by' => $user_id,
+                    'created_at' => date('Y-m-d H:i:s')
+                );
+                $amount      = $this->db->insert('wallet_withdraw', $wallet_data);
+				
+				//echo json_encode($user_id);exit;
+                if ($amount == true) {
+                    $amount_withdraw = $this->Stripe_model->wallet_withdraw_flow($params['amount'], $user_currency, $user_id,1);
+                }
+                $message ='Amount Withdrawn Successfully';
+                echo json_encode(array(
+                    'status' => true,
+                    'msg' => $message
+                ));
+            } else {
+                $message = (!empty($this->user_language[$this->user_selected]['lg_something_went_wrong'])) ? $this->user_language[$this->user_selected]['lg_something_went_wrong'] : $this->default_language['en']['lg_something_went_wrong'];
+                echo json_encode(array(
+                    'status' => false,
+                    'msg' => $message
+                ));
+            }
+        }
+    }
+	/*public function razorpay_details()
+    {
+        removeTag($this->input->post());
+        $params        = $this->input->post();
+        $user_id       = $this->session->userdata('SESSION_USER_ID');
+		$razorpay_option = $this->data['razorpay_option'];
+		if($razorpay_option == 1){			
+			$apikey = $this->data['razorpay_apikey'];
+			$apisecret = $this->data['razorpay_apisecret'];
+		}else if($razorpay_option == 2){
+			$apikey = $this->data['razorpaylive_apikey'];
+			$apisecret = $this->data['razorpaylive_apisecret'];
+		}
+        $user_currency = 'INR';
+        if (!empty($params)) { 
+			$url = "https://api.razorpay.com/v1/contacts";
+			$unique = strtoupper(uniqid());
+			$data   = ' {
+			  "name":"'.$params['name'].'",
+			  "email":"'.$params['email'].'",
+			  "contact":"'.$params['contact'].'",
+			  "type":"employee",
+			  "reference_id":"'.$unique.'",
+			  "notes":{}
+			}';
+			$ch     = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_USERPWD, $apikey . ":" . $apisecret);
+			$headers = array(
+				'Content-Type:application/json'
+			);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			$result = curl_exec($ch);
+			
+			if (curl_errno($ch)) {
+				$result = 'Error:' . curl_error($ch);
+				echo json_encode(array(
+                    'status' => false,
+                    'msg' => $result
+                ));
+			}
+			$results = json_decode($result);
+			$user_id       = $this->session->userdata('SESSION_USER_ID');
+			$cnotes = $results->notes;
+			$serializedcnotes = serialize($cnotes);
+			$contact_data = array(
+				'user_id' => $user_id,
+				'rp_contactid' => $results->id,
+				'entity' => $results->entity,
+				'name' => $results->name,
+				'contact' => $results->contact,
+				'email' => $results->email,
+				'type' => $results->type,
+				'reference_id' => $results->reference_id,
+				'batch_id' => $results->batch_id,
+				'active' => $results->active,
+				'accountnumber' => $params['accountnumber'],
+				'mode' => $params['mode'],
+				'purpose' => $params['purpose'],
+				'notes' => $serializedcnotes,
+				'created_at' => $results->created_at
+			);
+			$createcontact = $this->db->insert('razorpay_contact', $contact_data);
+			if(!empty($createcontact)){
+				$faurl = "https://api.razorpay.com/v1/fund_accounts";
+				$faunique = strtoupper(uniqid());
+				$fadata   = ' {
+				  "contact_id": "'.$results->id.'",
+				  "account_type": "bank_account",
+				  "bank_account": {
+					"name": "'.$params['bank_name'].'",
+					"ifsc": "'.$params['ifsc'].'",
+					"account_number":"'.$params['accountnumber'].'"
+				  }
+				}';
+								
+				$fach     = curl_init();
+				curl_setopt($fach, CURLOPT_URL, $faurl);
+				curl_setopt($fach, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($fach, CURLOPT_POSTFIELDS, $fadata);
+				curl_setopt($fach, CURLOPT_POST, 1);
+				curl_setopt($fach, CURLOPT_USERPWD, $apikey . ":" . $apisecret);
+				$faheaders = array(
+					'Content-Type:application/json'
+				);
+				curl_setopt($fach, CURLOPT_HTTPHEADER, $faheaders);
+				$faresult = curl_exec($fach);
+				
+				if (curl_errno($fach)) {
+					$faresult = 'Error:' . curl_error($fach);
+					echo json_encode(array(
+						'status' => false,
+						'msg' => $faresult
+					));
+				}
+				$faresults = json_decode($faresult);
+				
+				$fa_data = array(
+					'fund_account_id' => $faresults->id,
+					'entity' => $faresults->entity,
+					'contact_id' => $faresults->contact_id,
+					'account_type' => $faresults->account_type,
+					'ifsc' => $faresults->bank_account->ifsc,
+					'bank_name' => $faresults->bank_account->bank_name,
+					'name' => $faresults->bank_account->name,
+					'account_number' => $faresults->bank_account->account_number,
+					'active' => $faresults->active,
+					'batch_id' => $faresults->batch_id,
+					'created_at' => $faresults->created_at
+				);
+				$facreatecontact = $this->db->insert('razorpay_fund_account', $fa_data);
+				
+				if($facreatecontact){
+					$purl = "https://api.razorpay.com/v1/payouts";
+					$punique = strtoupper(uniqid());
+					$pdata   = ' {
+					  "account_number": "2323230032510196",
+					  "fund_account_id": "'.$faresults->id.'",
+					  "amount": "'.$params['amount'].'",
+					  "currency": "INR",
+					  "mode": "'.$params['mode'].'",
+					  "purpose": "'.$params['purpose'].'",
+					  "queue_if_low_balance": true,
+					  "reference_id": "'.$punique.'",
+					  "narration": "",
+					  "notes": {}
+					}';
+					
+					$pch     = curl_init();
+					curl_setopt($pch, CURLOPT_URL, $purl);
+					curl_setopt($pch, CURLOPT_RETURNTRANSFER, 1);
+					curl_setopt($pch, CURLOPT_POSTFIELDS, $pdata);
+					curl_setopt($pch, CURLOPT_POST, 1);
+					curl_setopt($pch, CURLOPT_USERPWD, $apikey . ":" . $apisecret);
+					$pheaders = array(
+						'Content-Type:application/json'
+					);
+					curl_setopt($pch, CURLOPT_HTTPHEADER, $pheaders);
+					$presult = curl_exec($pch);
+					
+					if (curl_errno($pch)) {
+						$presult = 'Error:' . curl_error($pch);						
+						echo json_encode(array(
+							'status' => false,
+							'msg' => $presult
+						));
+					}
+					$presults = json_decode($presult);
+					
+					$pydata = array(
+						'payout_id' => $presults->id,
+						'entity' => $presults->entity,
+						'fund_account_id' => $presults->fund_account_id,
+						'amount' => $presults->amount,
+						'currency' => $presults->currency,
+						'fees' => $presults->fees,
+						'tax' => $presults->tax,
+						'status' => $presults->status,
+						'utr' => $presults->utr,
+						'mode' => $presults->mode,
+						'purpose' => $presults->purpose,						
+						'reference_id' => $presults->reference_id,
+						'narration' => $presults->narration,
+						'batch_id' => $presults->batch_id,
+						'failure_reason' => $presults->failure_reason,
+						'created_at' => $presults->created_at
+					);
+					$payouts = $this->db->insert('razorpay_payouts', $pydata);
+					if($payouts){
+						$wdata = array(
+							'user_id' => $user_id,
+							'amount' => $presults->amount,
+							'currency_code' => $presults->currency,
+							'transaction_status' => 1,
+							'transaction_date' => date('Y-m-d'),
+							'request_payment' => 'RazorPay',
+							'status' => 1,
+							'created_by' => $user_id,
+							'created_at' => $presults->created_at
+						);
+						$payoutins = $this->db->insert('wallet_withdraw', $wdata);
+						if($payoutins){
+							$amount        = $presults->amount;
+							$user_id       = $this->session->userdata('SESSION_USER_ID');
+							$user          = $this->db->where('USERID', $user_id)->get('members')->row_array();
+							$user_name     = $user['username'];
+							$user_token    = $user['unique_code'];
+							$currency_type = $user['currency_code'];
+							$wallet = $this->db->where('user_provider_id', $user_id)->get('wallet_table')->row_array();
+							$wallet_amt = $wallet['wallet_amt'];
+							$history_pay['token']=$user_token;
+							$history_pay['user_provider_id']=$user_id;
+							$history_pay['currency_code']='INR';
+							$history_pay['transaction_id']=$presults->id;
+							$history_pay['paid_status']='1';
+							$history_pay['total_amt']=$presults->amount;
+							if($wallet_amt){
+								$current_wallet = $wallet_amt-$amount;
+							}else{
+								$current_wallet = $amount;
+							}
+							$history_pay['current_wallet']=$current_wallet;
+							$history_pay['reason']='Withdrawn Wallet Amt';
+							$history_pay['created_at']=date('Y-m-d H:i:s');
+							if($this->db->insert('wallet_transaction_history',$history_pay)){								
+								$this->db->where('user_provider_id', $user_id)->update('wallet_table', array(
+									'currency_code' => 'INR',
+									'wallet_amt' => $current_wallet
+								));								               
+							}
+							$message = "Amount Withdrawn Successfully";
+							echo json_encode(array(
+								'status' => true,
+								'msg' => $message
+							));
+						}else{
+							$message = "Payout details not Inserted";
+							echo json_encode(array(
+								'status' => false,
+								'msg' => $message
+							));
+						}
+					}else{
+						$message = "Payout details not Inserted";
+						echo json_encode(array(
+							'status' => false,
+							'msg' => $message
+						));
+					}
+				} 
+			}
+        }else{
+			$message = (!empty($this->user_language[$this->user_selected]['lg_something_went_wrong'])) ? $this->user_language[$this->user_selected]['lg_something_went_wrong'] : $this->default_language['en']['lg_something_went_wrong'];
+            echo json_encode(array(
+                    'status' => false,
+                    'msg' => $message
+                ));
+		}
+    }*/
+	
+	
+public function service_map_list(){
+
+  $this->db->select('tab_2.name,tab_1.service_latitude,tab_1.service_longitude,tab_1.service_title')->from('services tab_1');
+  $val=$this->db->join('providers tab_2','tab_2.id=tab_1.user_id','LEFT')->get()->result_array();
+
+  if(!empty($val)){
+
+    $result_json = [];
+
+    foreach ($val as $key => $value) {
+      $temp = $temp2 = [];
+      $temp2[] = $value["service_latitude"];
+      $temp2[] = $value["service_longitude"];
+
+      $temp['latLng'] = $temp2;
+      $temp['name'] = $value['name'];
+
+      $result_json[] = $temp;
+
+    }
+
+  }
+
+  $data=json_encode($result_json);
+  print($data);
+}
+//
 
 
 

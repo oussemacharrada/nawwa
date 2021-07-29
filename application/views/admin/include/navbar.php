@@ -6,7 +6,7 @@
 			<img src="<?php echo $base_url.$this->website_logo_front; ?>" width="140" height="46" alt="">
 		</a>
 		<a href="<?php echo $base_url; ?>dashboard" class="logo logo-small">
-			<img src="<?php echo base_url();?>assets/img/logo-icon.png" alt="Logo" width="30" height="30">
+			<img src="<?php echo $base_url.$this->website_logo_front; ?>" alt="Logo" width="30" height="30">
 		</a>
 	</div>
 	<a href="javascript:void(0);" id="toggle_btn">
@@ -99,7 +99,7 @@ $full_date =date('Y-m-d H:i:s', strtotime($value['utc_date_time']));
 	</ul>
 </div>
 
-<?php if($this->session->flashdata('error_message')) {  ?>
+                <?php if($this->session->flashdata('error_message')) {  ?>
 		<div class="alert alert-danger text-center" id="flash_error_message"><?php echo $this->session->flashdata('error_message');?></div>
 		<?php $this->session->unset_userdata('error_message');
 		} ?>

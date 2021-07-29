@@ -6,8 +6,11 @@ class Home_model extends CI_Model
 	public function __construct()
 	{
 		parent::__construct();
+    	 date_default_timezone_set('Asia/kolkata');
 
 	}
+        
+        
  
 
     public function get_category()
@@ -33,7 +36,7 @@ class Home_model extends CI_Model
 	public function get_service()
 	{
 	
-          $this->db->select("s.id,s.user_id,s.service_title,s.service_amount,s.service_location,s.service_image,c.category_name");
+          $this->db->select("s.id,s.user_id,s.service_title,s.service_amount,s.service_location,s.service_image,c.category_name,s.currency_code");
 	      $this->db->from('services s');
 	      $this->db->join('categories c', 'c.id = s.category', 'LEFT');
 	      $this->db->where("s.status = 1");
@@ -50,10 +53,10 @@ class Home_model extends CI_Model
      
 	      $this->db->order_by('s.total_views','DESC');
 	      $this->db->limit(10);
-	      $result = $this->db->get()->result_array();
+	      $query = $this->db->get(); $result = array(); if($query !== FALSE && $query->num_rows() > 0){ $result = $query->result_array(); }
 
         if(count($result)==0){
-            $this->db->select("s.id,s.user_id,s.service_title,s.service_amount,s.service_location,s.service_image,c.category_name");
+            $this->db->select("s.id,s.user_id,s.service_title,s.service_amount,s.service_location,s.service_image,c.category_name,s.currency_code");
           $this->db->from('services s');
           $this->db->join('categories c', 'c.id = s.category', 'LEFT');
           $this->db->where("s.status = 1");
@@ -88,7 +91,7 @@ class Home_model extends CI_Model
 
     function get_all_service($params = array(),$inputs=array()){ 
 
-          $this->db->select("s.id,s.user_id,s.service_title,s.service_amount,s.service_location,s.service_image,c.category_name");
+          $this->db->select("s.id,s.user_id,s.service_title,s.service_amount,s.service_location,s.service_image,c.category_name,s.currency_code");
 	      $this->db->from('services s');
 	      $this->db->join('categories c', 'c.id = s.category', 'LEFT');
 	      $this->db->where("s.status = 1");
@@ -157,7 +160,7 @@ class Home_model extends CI_Model
         
          
         if(array_key_exists("returnType",$params) && $params['returnType'] == 'count'){ 
-            $result = $this->db->count_all_results(); 
+            $result = ($this->db->get())?$this->db->count_all_results():FALSE;
         }else{ 
               
                 if(array_key_exists("start",$params) && array_key_exists("limit",$params)){ 
@@ -167,7 +170,7 @@ class Home_model extends CI_Model
                 } 
                  
                 $query = $this->db->get(); 
-                $result = ($query->num_rows() > 0)?$query->result_array():FALSE; 
+               $result = ($query)?$query->result_array():FALSE;  
             
         } 
          
@@ -339,7 +342,7 @@ class Home_model extends CI_Model
       }else{
         $city_name='';
       }
-       $this->db->select("s.id,s.user_id,s.service_title,s.service_amount,s.mobile_image,s.about,c.category_name,c.category_image,r.rating,sc.subcategory_name");
+       $this->db->select("s.id,s.user_id,s.service_title,s.service_amount,s.mobile_image,s.about,c.category_name,c.category_image,r.rating,sc.subcategory_name,s.currency_code");
         $this->db->from('services s');
         $this->db->join('categories c', 'c.id = s.category', 'LEFT');
         $this->db->join('subcategories sc', 'sc.id = s.subcategory', 'LEFT');
@@ -349,7 +352,9 @@ class Home_model extends CI_Model
         $this->db->where('sd.expiry_date_time>=',date('Y-m-d'));
 
         if(!empty($service['category'])){
-          $this->db->where('s.id!=',$service['id'])->where('s.category=',$service['category'])->or_where('s.subcategory=',$service['subcategory']);
+          $this->db->where('s.id!=',$service['id']);
+          $this->db->where('s.category=',$service['category'])->or_where('s.subcategory=',$service['subcategory']);
+          $this->db->where("s.status = 1");
         }
         if(!empty($this->session->userdata('current_location'))){
           $this->db->like('s.service_location',$this->session->userdata('current_location'),'after');
@@ -357,7 +362,7 @@ class Home_model extends CI_Model
         $this->db->group_by('s.id');
         $this->db->order_by('s.total_views','DESC');
         $this->db->limit(10);
-        return $result = $this->db->get()->result_array();
+        $query = $this->db->get(); $data = array(); if($query !== FALSE && $query->num_rows() > 0){ $data = $query->result_array(); } return $data;
 
 
         

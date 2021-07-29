@@ -5,13 +5,13 @@
 				<div class="row">
 					<div class="col-lg-6">
 						<div class="breadcrumb-title">
-							<h2>Categories</h2>
+							<h2><?php echo (!empty($user_language[$user_selected]['lg_category_name'])) ? $user_language[$user_selected]['lg_category_name'] : $default_language['en']['lg_category_name']; ?></h2>
 						</div>
 					</div>
 					<div class="col-lg-6">
 						<ul class="breadcrumbs">
-							<li><a href="<?php echo base_url();?>">Home</a></li>
-							<li><a>Categories</a></li>
+							<li><a href="<?php echo base_url();?>"><?php echo (!empty($user_language[$user_selected]['lg_home'])) ? $user_language[$user_selected]['lg_home'] : $default_language['en']['lg_home']; ?></a></li>
+							<li><a><?php echo (!empty($user_language[$user_selected]['lg_category_name'])) ? $user_language[$user_selected]['lg_category_name'] : $default_language['en']['lg_category_name']; ?></a></li>
 						</ul>
 					</div>
 				</div>
@@ -24,7 +24,7 @@
 			<div class="container">
 						<div class="ml-filterbar clearfix s2">
 							
-							<h3>Results Found</h3>
+							<h3><?php echo (!empty($user_language[$user_selected]['lg_results_found'])) ? $user_language[$user_selected]['lg_results_found'] : $default_language['en']['lg_results_found']; ?></h3>
 						</div>
                         <!-- Categories Starts -->						
                         <div class="catsec">

@@ -230,7 +230,7 @@ $config['composer_autoload'] = FALSE;
 | DO NOT CHANGE THIS UNLESS YOU FULLY UNDERSTAND THE REPERCUSSIONS!!
 |
 */
-$config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
+$config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-@\=';
 
 /*
 |--------------------------------------------------------------------------
@@ -522,14 +522,45 @@ $config['global_xss_filtering'] = FALSE;
 */
 if (isset($_SERVER["REQUEST_URI"])) 
 {
-    if(stripos($_SERVER["REQUEST_URI"],'/api') === FALSE)
+    /*if(stripos($_SERVER["REQUEST_URI"],'/api') === FALSE)
     {
         $config['csrf_protection'] = TRUE;
     }
     else
     {
         $config['csrf_protection'] = FALSE;
-    } 
+    }*/
+	
+	
+	//echo "<pre>";print_r($_SERVER["REQUEST_URI"]);exit;
+	
+	if(stripos($_SERVER["REQUEST_URI"],'/paytabs_success') !==false)
+	{
+		 $config['csrf_protection'] = FALSE;
+		 $cf=1;
+	}
+	elseif(stripos($_SERVER["REQUEST_URI"],'/razorpay_details') !==false)
+    {
+        $config['csrf_protection'] = FALSE;
+		$cf=9;
+    }
+	elseif(stripos($_SERVER["REQUEST_URI"],'/bank_details') !==false)
+    {
+        $config['csrf_protection'] = FALSE;
+		$cf=8;
+    }
+	elseif(stripos($_SERVER["REQUEST_URI"],'/api')  !==false)
+    {
+        $config['csrf_protection'] = FALSE;
+		$cf=2;
+    }
+    else
+    {
+        $config['csrf_protection'] = TRUE;
+		$cf=3;
+    }
+//echo "<pre>";print_r($cf);exit;
+	
 } 
 else 
 {
@@ -539,7 +570,7 @@ $config['csrf_token_name'] = 'csrf_token_name';
 $config['csrf_cookie_name'] = 'csrf_cookie_name';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = FALSE;
-$config['csrf_exclude_uris'] = array('api');
+$config['csrf_exclude_uris'] = array();
 
 /*
 |--------------------------------------------------------------------------

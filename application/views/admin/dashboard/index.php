@@ -6,7 +6,27 @@ $users = $this->dashboard->users_list_all();
 $providers = $this->dashboard->providers_list_all();
 $services = $this->dashboard->services_list_all();
 $bookinglist = $this->dashboard->get_bookinglist();
+$map_key=settingValue('map_key');
+
+//echo "<pre>";print_r(settingValue('map_key'));exit;
 ?>
+
+<style >
+  #map-container {
+	padding: 6px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #ccc #ccc #999 #ccc;
+	-webkit-box-shadow: rgba(64, 64, 64, 0.5) 0 2px 5px;
+	-moz-box-shadow: rgba(64, 64, 64, 0.5) 0 2px 5px;
+	box-shadow: rgba(64, 64, 64, 0.1) 0 2px 5px;
+	width: 800px;
+  }
+  #map {
+	width: 790px;
+	height: 500px;
+  }
+</style>
 <div class="page-wrapper">
 	<div class="content container-fluid">
 	
@@ -92,7 +112,7 @@ $bookinglist = $this->dashboard->get_bookinglist();
 							</span>
 							<div class="dash-widget-info">
 								<h3>
-								$<?php if(!empty($payment)){ echo $payment;}else{ echo "0"; } ?>
+								<?php if(!empty($payment)){ echo currency_code_sign(settings('currency')).$payment;}else{ echo currency_code_sign(settings('currency'))."0"; } ?>
 								</h3>
 								<h6 class="text-muted">Subscription</h6>
 							</div>
@@ -140,10 +160,38 @@ $bookinglist = $this->dashboard->get_bookinglist();
 										<td class="text-nowrap"><?php echo date('d-m-Y',strtotime($list['service_date']))?></td>
 										<td class="text-center"><?php echo $list['service_title']?></td>
 										<td class="text-center">
-											<span class="badge bg-success inv-badge"><?php if($list['status'] == '6') { ?>Accepted<?php } else { ?>Pending<?php }?></span>
+											<?php if ($list['status']==1) {
+											$badge='Pending';
+											$color='warning';
+											}
+											if ($list['status']==2) {
+												$badge='Inprogress';
+												$color='info';
+											}
+											if ($list['status']==3) {
+												$badge='Complete Request';
+												$color='primary';
+											}
+											if ($list['status']==4) {
+												$badge='Accepted';
+												$color='muted';
+											}
+											if ($list['status']==5) {
+												$badge='Rejected by User';
+												$color='warning';
+											} 
+											if ($list['status']==6) {
+												$badge='Payment Completed';
+												$color='success';
+											}
+											if ($list['status']==7) {
+												$badge='Cancelled by Provider';
+												$color='danger';
+											}?>
+											<span class="badge bg-<?php echo $color;?> inv-badge"><?php echo $badge;?></span>
 										</td>
 										<td class="text-right">
-											<div class="font-weight-600">$<?php echo $list['service_amount']?></div>
+											<div class="font-weight-600"><?php echo currency_conversion($list['currency_code1']);?><?php echo $list['service_amount']?></div>
 										</td>
 									</tr>
 									<?php } } else {
@@ -231,7 +279,7 @@ $bookinglist = $this->dashboard->get_bookinglist();
 										<td><?=date('d-m-Y',strtotime($rows['service_date']));?></td>
 										<td><?php echo $provider_name['name'] ?></td>
 										<td><?php echo $service['service_title']?></td>
-										<td>$<?php echo $rows['amount']?></td>
+										<td><?php echo currency_conversion($rows['currency_code']);?><?php echo $rows['amount']?></td>
 										<td><span class="badge bg-<?=$color;?> inv-badge"><?php echo $status?></span></td>
 									</tr>
 									<?php } } else {
@@ -245,7 +293,7 @@ $bookinglist = $this->dashboard->get_bookinglist();
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		<<div class="row">
 			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header">
@@ -262,6 +310,28 @@ $bookinglist = $this->dashboard->get_bookinglist();
 					</div>
 				</div>
 			</div>
+		</div>-->
+		
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card" style="align-items: center;">
+					<div class="card-header">
+						<h4 class="card-title">Provider in Map</h4>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="">
+								    <div id="map-container"><div id="map"></div></div>
+									<div id="world-map-markers"></div>
+								</div>                                                                     
+							</div>                              
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>          
 </div>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?=$map_key?>"></script>
+<script type="text/javascript" src="<?php echo base_url();?>assets/js/markerclusterer.js"></script>

@@ -10,11 +10,12 @@
     var id=$(this).attr('data-amount');
       withdraw_wallet_value(id);
     }); 
-    $('.isNumber').on('keypress',function(e){ 
-        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-               return false;
-    }
-    });
+   $('.isNumber').on('keypress', function (evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode;
+			var element =  this;
+			if ((charCode != 45 || $(element).val().indexOf('-') != -1) && (charCode != 46 || $(element).val().indexOf('.') != -1) && (charCode < 48 || charCode > 57))
+				return false;
+        });
  });
 var stripe_key=$("#stripe_key").val();
   // Create a Stripe client.
@@ -66,8 +67,8 @@ card.addEventListener('change', function(event) {
 var sub_btn = document.getElementById('pay_btn');
 
 sub_btn.addEventListener('click', function(event) {
-
-  stripe.createToken(card,{'currency': 'USD'}).then(function(result) {
+var currency_val=$("#currency_val").val();
+  stripe.createToken(card,{'currency': currency_val}).then(function(result) {
     if (result.error) {
       var errorElement = document.getElementById('card-errors');
       errorElement.textContent = result.error.message;
@@ -78,7 +79,7 @@ sub_btn.addEventListener('click', function(event) {
            var stripe_amt=$("#wallet_withdraw_amt").val();
            
            var tokenid = result.token.id;
-           var data="Token="+tokens+"&amount="+stripe_amt+"&tokenid="+tokenid+"&csrf_token_name="+csrf_token;
+           var data="Token="+tokens+"&amount="+stripe_amt+"&currency_val="+currency_val+"&tokenid="+tokenid+"&csrf_token_name="+csrf_token;
            $.ajax({
            url: base_url+'api/withdraw-provider',
            data:data,
@@ -135,59 +136,222 @@ sub_btn.addEventListener('click', function(event) {
     }
   });
 });
-	$('#stripe_withdraw_wallet').on('click', function(e) {
-        var stripe_amt=$("#wallet_withdraw_amt").val();
-          if(stripe_amt =='' || stripe_amt < 1){
+	// $('#stripe_withdraw_wallet').on('click', function(e) {
+        // var stripe_amt=$("#wallet_withdraw_amt").val();
+          // if(stripe_amt =='' || stripe_amt < 1){
 
-                    swal({
-                           title: "Empty amount",
-                           text: "Wallet field was empty please fill it...",
-                           icon: "error",
-                           button: "okay",
-                                         closeOnEsc: false,
-              closeOnClickOutside: false
-                       });
+                    // swal({
+                           // title: "Empty amount",
+                           // text: "Wallet field was empty please fill it...",
+                           // icon: "error",
+                           // button: "okay",
+                                         // closeOnEsc: false,
+              // closeOnClickOutside: false
+                       // });
 
-                    $("#wallet_withdraw_amt").select();
-                    return false;
-                  }
+                    // $("#wallet_withdraw_amt").select();
+                    // return false;
+                  // }
 
-          var token=$('#token').val();
-        var tokens=token;
+          // var token=$('#token').val();
+        // var tokens=token;
 
-        var data="token="+tokens;
+        // var data="token="+tokens;
 
-        $.ajax({
-               url: base_url+'api/get-wallet',
-               data:{token:tokens,csrf_token_name:csrf_token},
-               type: 'POST',
-               dataType: 'JSON',
-               success: function(response){
-                console.log(response.data.wallet_info);
-                var wallet_amt=response.data.wallet_info.wallet_amt;
-                   if(Number(wallet_amt) < Number(stripe_amt)){
-                          swal({
-                                 title: "Exceeding Wallet amount",
-                                 text: "Enter the amount less than wallet amount...!",
-                                 icon: "error",
-                                 button: "okay",
-                                               closeOnEsc: false,
-              closeOnClickOutside: false
-                           });
-                           $("#wallet_withdraw_amt").select();
-                           return false;
+        // $.ajax({
+               // url: base_url+'api/get-wallet',
+               // data:{token:tokens,csrf_token_name:csrf_token},
+               // type: 'POST',
+               // dataType: 'JSON',
+               // success: function(response){
+                // console.log(response.data.wallet_info);
+                // var wallet_amt=response.data.wallet_info.wallet_amt;
+                   // if(Number(wallet_amt) < Number(stripe_amt)){
+                          // swal({
+                                 // title: "Exceeding Wallet amount",
+                                 // text: "Enter the amount less than wallet amount...!",
+                                 // icon: "error",
+                                 // button: "okay",
+                                               // closeOnEsc: false,
+              // closeOnClickOutside: false
+                           // });
+                           // $("#wallet_withdraw_amt").select();
+                           // return false;
 
-                    }else{
-                   var stripe_amts=$("#wallet_withdraw_amt").val();
+                    // }else{
+                   // var stripe_amts=$("#wallet_withdraw_amt").val();
 
-                      $("#card_form_div").show();
-                      $("#check_wallet_div").hide();
-                      $("#remember_withdraw_wallet").text(stripe_amts);
-                    }
-                 }
-             })
+                      // $("#card_form_div").show();
+                      // $("#check_wallet_div").hide();
+                      // $("#remember_withdraw_wallet").text(stripe_amts);
+                    // }
+                 // }
+             // })
 
-   });
+   // });
+   
+   
+$('#stripe_withdraw_wallet').on('click',function(){
+var stripe_amt=$("#wallet_withdraw_amt").val();
+var wallet_amount=$('#wallet_amount').val();
+var payment_type =$( 'input[name="group2"]:checked' ).val();
+if(payment_type==undefined || payment_type==''){
+	swal({
+		title: 'Wallet',
+		text: 'Wallet field was empty please fill it',
+		icon: "error",
+		button: "okay",
+		closeOnEsc: false,
+		closeOnClickOutside: false
+	});
+	$("#wallet_withdraw_amt").select();
+	return false;
+}
+if(Number(stripe_amt)>Number(wallet_amount)){
+	swal({
+		title: 'Exceeding Wallet amount',
+		text: 'Enter the amount less than wallet amount...!',
+		icon: "error",
+		button: "okay",
+		closeOnEsc: false,
+		closeOnClickOutside: false
+	});
+	$("#wallet_withdraw_amt").select();
+	return false;
+}
+if(stripe_amt =='' || stripe_amt < 1){
+	swal({
+		title: 'Empty amount',
+		text: 'Wallet field was empty please fill it...',
+		icon: "error",
+		button: "okay",
+		closeOnEsc: false,
+		closeOnClickOutside: false
+	});
+	$("#wallet_withdraw_amt").select();
+	return false;
+}  
+$('.bank_details').hide();
+$('.paypal_details').hide();
+$('.razorpay_details').hide();
+if(payment_type=="Direct"){
+	//var stripe_amts=$("#wallet_withdraw_amt").val();
+	$("#card_form_div").show();
+	$("#check_wallet_div").hide();
+	$("#remember_withdraw_wallet").text(stripe_amt);
+}else if(payment_type=="RazorPay"){
+	
+	$("#card_form_div").hide();
+	$('#withdraw_modal').modal('show');
+	$('.razorpay_details').show();
+	$('.paypal_details').hide();
+	$('.bank_details').hide();
+}else if(payment_type=="stripe"){
+	
+	$("#card_form_div").hide();
+	$('#withdraw_modal').modal('show');
+	$('.bank_details').show();
+	$('.paypal_details').hide();
+	$('.razorpay_details').hide();
+} 
+
+$('#stripe_amount').val(stripe_amt);   
+$('#payment_types').val(payment_type);   
+});
+
+
+
+$(document).ready(function(){
+	$('#bank_details').on('submit',function(e){
+		e.preventDefault();
+		var payment_type =$( 'input[name="group2"]:checked' ).val();	  
+		if(payment_type=="RazorPay"){
+			razorpay_details();
+		}else{
+			var account_no=$('#account_no').val();
+			if(account_no==""){
+				$('.account_no_error').text(account_no_error).css('color','red');
+			}
+			if(account_no!=''){
+				bank_details();
+			}
+		}
+
+	});
+});
+
+
+function razorpay_details(){
+	$.ajax({
+		type:'POST',
+		url: base_url+'user/dashboard/razorpay_details',
+		//url: base_url+'user/wallet/razorpay_details',
+		data :  $('#bank_details').serialize(),
+		dataType:'json',
+		success:function(response) {
+			
+			if(response.status){
+				swal({
+					title:response.msg,
+					text: response.msg,
+					icon: "success",
+					button: "okay",
+					closeOnEsc: false,
+					closeOnClickOutside: false
+				}).then(function(){
+					location.reload();
+				});
+			}else{
+				swal({
+					title: response.msg,
+					text: response.msg,
+					icon: "error",
+					button: "okay",
+					closeOnEsc: false,
+					closeOnClickOutside: false
+				}).then(function(){
+					location.reload();
+				});
+			}
+		}
+	});
+}
+
+	function bank_details(){
+		$.ajax({
+			type:'POST',
+			url: base_url+'user/dashboard/bank_details',
+			data :  $('#bank_details').serialize(),
+			dataType:'json',
+			success:function(response) {
+				if(response.status){
+					swal({
+						title:response.msg,
+						text: response.msg,
+						icon: "success",
+						button: "okay",
+						closeOnEsc: false,
+						closeOnClickOutside: false
+					}).then(function(){
+						location.reload();
+					});
+				}else{
+					swal({
+						title: response.msg,
+						text: response.msg,
+						icon: "error",
+						button: "okay",
+						closeOnEsc: false,
+						closeOnClickOutside: false
+					}).then(function(){
+						location.reload();
+					});
+				}
+			}
+		});
+	}
+	
+	
 
 	$('#cancel_card_btn').on('click', function() {
 		$("#card_form_div").hide();

@@ -9,6 +9,7 @@ class Service extends CI_Controller {
 
   parent::__construct();
   $this->load->model('service_model','service');
+  $this->load->model('common_model','common_model');
   $this->data['theme'] = 'admin';
   $this->data['model'] = 'service';
   $this->data['base_url'] = base_url();
@@ -24,6 +25,7 @@ public function index()
 }
 public function subscriptions()
 {
+	$this->common_model->checkAdminUserPermission(9);
   if($this->session->userdata('admin_id'))
   {
     $this->data['page'] = 'subscriptions';
@@ -39,6 +41,7 @@ public function subscriptions()
 
 public function add_subscription()
 {
+	$this->common_model->checkAdminUserPermission(9);
   if($this->session->userdata('admin_id'))
   {
     $this->data['page'] = 'add_subscription';
@@ -83,10 +86,12 @@ public function check_subscription_name()
 }
 
 public function save_subscription()
-{ removeTag($this->input->post());
+{
+$this->common_model->checkAdminUserPermission(9);
+	removeTag($this->input->post());
   $data['subscription_name'] = $this->input->post('subscription_name');
   $data['fee'] = $this->input->post('subscription_amount');
-  $data['currency_code'] = 'USD';
+  $data['currency_code'] = settings('currency');
   $data['duration'] = $this->input->post('subscription_duration');
   $data['fee_description'] = $this->input->post('fee_description');
   $data['status'] = $this->input->post('status');
@@ -105,6 +110,7 @@ public function save_subscription()
 
 public function edit_subscription($id)
 {
+	$this->common_model->checkAdminUserPermission(9);
   if($this->session->userdata('admin_id'))
   {
     $this->data['page'] = 'edit_subscription';
@@ -120,11 +126,13 @@ public function edit_subscription($id)
 }
 
 public function update_subscription()
-{ removeTag($this->input->post());
+{ 
+$this->common_model->checkAdminUserPermission(9);
+removeTag($this->input->post());
   $where['id'] = $this->input->post('subscription_id');
   $data['subscription_name'] = $this->input->post('subscription_name');
   $data['fee'] = $this->input->post('subscription_amount');
-  $data['currency_code'] = 'USD';
+  $data['currency_code'] = settings('currency');
   $data['duration'] = $this->input->post('subscription_duration');
   $data['fee_description'] = $this->input->post('fee_description');
   $data['status'] = $this->input->post('status');
@@ -143,7 +151,7 @@ public function update_subscription()
 
 public function service_providers()
 {
-  
+   $this->common_model->checkAdminUserPermission(12);
   $this->data['page'] = 'service_providers';
   $this->data['subcategory']=$this->service->get_subcategory();
   $this->load->vars($this->data);
@@ -154,6 +162,7 @@ public function service_providers()
 
 public function provider_details($value='')
 {
+	 $this->common_model->checkAdminUserPermission(12);
   $this->data['page'] = 'provider_details';
   $this->load->vars($this->data);
   $this->load->view($this->data['theme'].'/template');
@@ -161,6 +170,7 @@ public function provider_details($value='')
 
 public function provider_list()
 {
+	 $this->common_model->checkAdminUserPermission(12);
   extract($_POST);
   if($this->input->post('form_submit'))
   {
@@ -217,8 +227,7 @@ public function provider_list()
   {
     $val = 'checked';
   }
-
-  $row[]='<a href="#" class="btn btn-sm bg-danger-light delete_service_provider" title="Delete" data-id="'.$template->id.'"><i class="far fa-trash-alt mr-1"></i> Delete</a>';
+  $row[] ='<div class="status-toggle"><input id="status_'.$template->id.'" class="check change_Status_provider1" data-id="'.$template->id.'" type="checkbox" '.$val.'><label for="status_'.$template->id.'" class="checktoggle">checkbox</label></div>';
 
   $data[] = $row;
 }
@@ -237,6 +246,7 @@ echo json_encode($output);
 
 public function service_list()
 {
+	$this->common_model->checkAdminUserPermission(4);
  extract($_POST);
  
  $this->data['page'] = 'service_list';
@@ -261,6 +271,7 @@ $this->load->view($this->data['theme'].'/template');
 
 public function service_details($value='')
 {
+	$this->common_model->checkAdminUserPermission(4);
   $this->data['page'] = 'service_details';
   $this->load->vars($this->data);
   $this->load->view($this->data['theme'].'/template');

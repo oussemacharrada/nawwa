@@ -6,6 +6,7 @@ class Service_model extends CI_Model
 	public function __construct()
 	{
 		parent::__construct();
+                
 	}
  
 
@@ -57,6 +58,7 @@ class Service_model extends CI_Model
 		$this->db->from('services_image');
 		$this->db->where("service_id",$service_id);
 		$this->db->where("status",1);
+		$this->db->order_by('id','ASC');
 		return $this->db->get()->result_array();
 
 	}
@@ -490,6 +492,7 @@ class Service_model extends CI_Model
           if(!empty($to_date)){
           $this->db->where('S.created_at <=',$to_date);
           }
+          $this->db->where('S.status',1);
           return $this->db->get()->result_array();
 
 
@@ -501,12 +504,14 @@ class Service_model extends CI_Model
       $this->db->from('services S');
       $this->db->join('categories C','C.id=S.category','left');
       $this->db->join('subcategories Sc','Sc.id=S.subcategory','left');
+      $this->db->where('S.status',1);
       return $this->db->get()->result_array();   
     }
 
     public function service_list_all(){
 
       $this->db->from('services');
+      $this->db->where('status',1);
       return $this->db->count_all_results();
     }
 
@@ -548,7 +553,7 @@ class Service_model extends CI_Model
     public function check_booking_list($id){
       $ret=$this->db->select('*')->
                       from('book_service')->
-                      where('service_id',$id)->where_not_in('status',[5,7])->
+                      where('service_id',$id)->where_not_in('status',[5,7,6])->
                       get()->result();
 
       if(count($ret)>0){

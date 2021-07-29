@@ -8,10 +8,14 @@ class Booking extends CI_Controller {
    public function __construct() {
 
         parent::__construct();
+		
         $this->load->model('service_model','service');
         $this->load->model('Api_model','api');
         $this->load->model('wallet_model','wallet');
         $this->load->model('Booking_report_model','book');
+		$this->load->model('common_model','common_model');
+		$this->load->model('templates_model');
+		$this->site_name ='Truelysell';
 
         $this->data['theme'] = 'admin';
         $this->data['model'] = 'bookings';
@@ -27,8 +31,7 @@ class Booking extends CI_Controller {
 	{
 
     if(!empty($this->input->post())){
-      echo "asdasd";
-      exit;
+      
     }else{
       $this->data['page'] = 'wallet_report_view';
       $this->data['model'] = 'wallet';
@@ -41,7 +44,7 @@ class Booking extends CI_Controller {
 	}
 
   public function total_bookings() {
-
+	$this->common_model->checkAdminUserPermission(5);
     if(!empty($this->input->post())){
       extract($_POST);
          
@@ -90,6 +93,7 @@ class Booking extends CI_Controller {
 
   /*pending report*/
     public function pending_bookings() {
+		$this->common_model->checkAdminUserPermission(5);
     if(!empty($this->input->post())){
       extract($_POST);
          
@@ -138,6 +142,7 @@ class Booking extends CI_Controller {
 /*Inprogress*/
 
   public function inprogress_bookings() {
+	  $this->common_model->checkAdminUserPermission(5);
     if(!empty($this->input->post())){
       extract($_POST);
          
@@ -186,6 +191,7 @@ class Booking extends CI_Controller {
   /*Completed*/
 
     public function completed_bookings() {
+		$this->common_model->checkAdminUserPermission(5);
     if(!empty($this->input->post())){
       extract($_POST);
          
@@ -234,6 +240,7 @@ class Booking extends CI_Controller {
   /*Rejected*/
 
     public function rejected_bookings() { 
+	$this->common_model->checkAdminUserPermission(5);
     if(!empty($this->input->post())){
       extract($_POST);
          
@@ -282,6 +289,7 @@ class Booking extends CI_Controller {
 /*Cancelled booking*/
 
   public function cancel_bookings() {
+	  $this->common_model->checkAdminUserPermission(5);
     if(!empty($this->input->post())){
       extract($_POST);
          
@@ -414,6 +422,7 @@ class Booking extends CI_Controller {
 /* rejected payments */
 
 public function reject_booking_payment(){
+	$this->common_model->checkAdminUserPermission(5);
       $id=$this->uri->segment('2');
 
       if(!empty($this->uri->segment('2'))){
@@ -433,17 +442,23 @@ public function reject_booking_payment(){
 /* rejected function */
 
 public function update_reject_payment(){
+	$this->common_model->checkAdminUserPermission(5);
   if(!empty($_POST['booking_id']))
       
     $pay= $this->book->get_reject_bookings_by_id($_POST['booking_id']);
 
   if(!empty($pay['id'])){
             $paid_token='';
+			$tomailid = '';
             if($_POST['token']==$pay['user_token']){
             $paid_token=$pay['user_token'];
+			$this->data['uname'] = $pay['user_name'];
+			$tomailid = $pay['user_email'];
             }
             if($_POST['token']==$pay['provider_token']){
             $paid_token=$pay['provider_token'];
+			$this->data['uname'] = $pay['provider_name'];
+			$tomailid = $pay['provider_email'];
             }
 
             $data['book_id']=$pay['id'];
@@ -455,6 +470,47 @@ public function update_reject_payment(){
             $ret=$this->book->reject_pay_proccess($data);
             if($ret){
                $this->session->set_flashdata('success_message','Reject Payment added successfully');
+			   
+			   $phpmail_config=settingValue('mail_config');
+              if(isset($phpmail_config)&&!empty($phpmail_config)){
+                if($phpmail_config=="phpmail"){
+                  $from_email=settingValue('email_address');
+                }else{
+                  $from_email=settingValue('smtp_email_address');
+                }
+              }
+			  $this->data['service_amount']= $pay['amount'];
+			  $this->data['service_date']= $pay['service_date'];
+			  $this->data['service_title']= $data['service_title'];
+              $this->data['comments'] = $data['favour_comment'];
+			 // $providerbody=$this->load->view('user/email/service_email_admin',$this->data,true);
+			  $bodyid = 5;
+			  $tempbody_details= $this->templates_model->get_usertemplate_data($bodyid);
+			  $body = $tempbody_details['template_content'];
+			  $body = str_replace('{user_name}', $this->data['uname'], $body);
+			  $body = str_replace('{service_amount}', $pay['amount'], $body);
+			  $body = str_replace('{service_title}', $pay['service_title'], $body);
+			  $body = str_replace('{service_date}', $pay['service_date'], $body);
+			  $body = str_replace('{admin_comments}', $data['favour_comment'], $body);
+			  $body = str_replace('{sitetitle}',$this->site_name, $body);
+			  $preview_link = base_url();
+			  $body = str_replace('{preview_link}',$preview_link, $body);
+			  
+              $this->load->library('email');
+			  //$this->load->library('sms');
+              //Send mail to provider
+              if(!empty($from_email)&&isset($from_email)){
+	        	$mail = $this->email
+	            	->from($from_email)
+	            	->to($tomailid)
+	            	->subject('Service Booking Refund')
+                    ->message($body)
+	            	->send();
+	         }
+			  //send sms to provider
+			  // $smsmessage = "Hi ".$this->data['uname'].", Admin has refunded your amount(". $pay['amount'] .") of this service (". $data['service_title'].") booked on ". $pay['service_date'];	  
+			  // $this->sms->send_message($tomobile,$smsmessage);
+			  
       redirect(base_url('admin/reject-report'));
 
             }else{

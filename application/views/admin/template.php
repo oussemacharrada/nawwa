@@ -8,3 +8,7 @@ if (isset($this->session->userdata['admin_id'])) {
 } else {
    redirect(base_url().'admin/login');
 }
+
+
+       
+       

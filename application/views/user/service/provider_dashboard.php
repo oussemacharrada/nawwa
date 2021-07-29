@@ -8,6 +8,22 @@ if(!empty($my_subscribe)){
 	$subscription_name['subscription_name']='';
 }
 ?>
+<div class="breadcrumb-bar">
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<div class="breadcrumb-title">
+				</div>
+			</div>
+			<div class="col-auto float-right ml-auto breadcrumb-menu">
+				<nav aria-label="breadcrumb" class="page-breadcrumb">
+					<ol class="breadcrumb">
+						</ol>
+				</nav>
+			</div>
+		</div>
+	</div>
+</div>
 <div class="content">
 	<div class="container">
 		<div class="row">
@@ -105,8 +121,11 @@ if(!empty($my_subscribe)){
 									<li class="col-6 col-lg-6">
 										<p>Started On <?php if(!empty($my_subscribe['subscription_date'])){echo date('d M, Y',strtotime($my_subscribe['subscription_date']));}?></p>
 									</li>
-									<li class="col-6 col-lg-6">
-										<p>Price $<?php if(!empty($subscription_name['fee'])){echo $subscription_name['fee']; }
+									<?php  $user_currency = settings('currency');
+										   $user_currency_code =  settings('currency');                          
+						        	?>
+						 			<li class="col-6 col-lg-6">
+										<p>Price <?php if(!empty($subscription_name['fee'])){ echo currency_conversion($user_currency_code) . get_gigs_currency($subscription_name['fee'],  settings('currency'), $user_currency_code); }
 													?></p>
 									</li>
 								</ul>
@@ -116,7 +135,7 @@ if(!empty($my_subscribe)){
 										<p>Paid at <?php if(!empty($my_subscribe['subscription_date'])){echo date('d M Y',strtotime($my_subscribe['subscription_date'])); }?></p>
 									</li>
 									<li class="col-sm-6">
-										<p><span class="text-success">Paid</span> <span class="amount">$<?php if(!empty($subscription_name['fee'])){ echo $subscription_name['fee'];}?></span></p>
+										<p><span class="text-success">Paid</span> <span class="amount"><?php if(!empty($subscription_name['fee'])){ echo currency_conversion($user_currency_code) . get_gigs_currency($subscription_name['fee'], $subscription_name['currency_code'], $user_currency_code);}?></span></p>
 									</li>
 								</ul>
 							</div>

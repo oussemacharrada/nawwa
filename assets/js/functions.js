@@ -20,6 +20,65 @@
 
     $('.error_cancel').hide();
     $('.header-content-blk').hide();
+    $('#contact_form').bootstrapValidator({
+      fields: {
+        name:           {
+       validators: {		 
+         notEmpty: {
+         message: 'Please enter your name'
+         }
+       }
+       },
+         email:           {
+       validators: {		 
+         notEmpty: {
+         message: 'Please enter your email'
+         },
+         emailAddress: {
+                message: 'The value is not a valid email address'
+             }
+       }
+       },
+       message:           {
+       validators: {		 
+         notEmpty: {
+         message: 'Please enter your message'
+         }
+       }
+       }
+     }
+     }).on('success.form.bv', function(e) {
+       var name = $('#name').val();
+       var email = $('#email').val();
+       var message = $('#message').val();
+       $.ajax({
+       type:'POST',
+       url: base_url+'user/contact/insert_contact',
+       data : {name:name,email:email,csrf_token_name:csrf_token,message:message},
+       success:function(response)
+       {
+         if(response==1)
+         {
+            swal({
+            title: "Message Send !",
+            text: "Message Send Successfully....!",
+            icon: "success",
+            button: "okay",
+            closeOnEsc: false,
+            closeOnClickOutside: false
+            }).then(function(){
+           window.location.href = base_url+'contact';
+         });
+         
+         } else {
+         $("#flash_error_message1").show();
+         $('#flash_error_message1').append('Wrong Credentials');
+         return false;
+         }
+       }
+       });
+       return false;
+     });  
 
     $('#re_send_otp_user').on('click',function(){
       re_send_otp_user();
@@ -593,12 +652,17 @@ if($('.days_check').is(':checked') == true){
 
 
 $(document).on('click','.days_check',function(){
-
+   var from_time = '';
+   var to_time = '';
+   if($('.daysfromtime_check').val()){
+	   var from_time = $('.daysfromtime_check').val();
+   }
+   if($('.daystotime_check').val()){
+	   var to_time = $('.daystotime_check').val();
+   }
  if($(this).is(':checked') == true){
-
-
-  $('.daysfromtime_check').val('00:00 AM');
-  $('.daystotime_check').val('11:30 PM');
+  $('.daysfromtime_check').val(from_time);
+  $('.daystotime_check').val(to_time);
   $('.eachdays').attr('disabled','disabled');
   $('.eachdayfromtime').attr('disabled','disabled');
   $('.eachdaytotime').attr('disabled','disabled');
@@ -614,8 +678,8 @@ $(document).on('click','.days_check',function(){
  $('.eachdayfromtime').removeAttr('disabled');
  $('.eachdaytotime').removeAttr('disabled');
 
- $('.daysfromtime_check').val('');
- $('.daystotime_check').val('');
+ $('.daysfromtime_check').val(from_time);
+ $('.daystotime_check').val(to_time);
  $('.daysfromtime_check').removeAttr('style');
  $('.daystotime_check').removeAttr('style');
 }
@@ -1590,7 +1654,8 @@ if(modules=="services" || modules=="service"){
  function get_latitude_longitude() {
    // Get the place details from the autocomplete object.
    var place = autocomplete.getPlace();
-   var key = "AIzaSyDzviwvvZ_S6Y1wS6_b3siJWtSJ5uFQHoc";
+    var key = $("#map_key").val();//alert(map_key);
+   //var key = "AIzaSyDeO6sZPbgwN0sWtMi7FhfS-9IAcQQnEs0";
    $.get('https://maps.googleapis.com/maps/api/geocode/json',{address:place.formatted_address,key:key},function(data, status){
 
      $(data.results).each(function(key,value){
@@ -1604,7 +1669,7 @@ if(modules=="services" || modules=="service"){
    });
  }
 
- function geolocate() {
+ function geolocate() {    
 
    if (navigator.geolocation) {
      navigator.geolocation.getCurrentPosition(function (position) {

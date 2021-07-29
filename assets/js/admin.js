@@ -6,17 +6,41 @@
 
 	// Variables declarations
 	
-	var $wrapper = $('.main-wrapper');
+	var $wrapper = $('.main-change_languagewrapper');
 	var $pageWrapper = $('.page-wrapper');
 	var $slimScrolls = $('.slimscroll');
 	$( document ).ready(function() {
-   $('.change_Status_user').on('click',function(){
-    var id=$(this).attr('data-id');
-    change_Status_user(id);
-  });
    $('#save_profile_change').on('click',function(){
     changeAdminProfile();
   });
+  
+     $('#adminmail').on('blur',function(){
+    
+	 var email = $('#adminmail').val();//alert(email);
+    $.ajax({
+     type:'POST',
+     url: base_url+'admin/profile/check_admin_mail',
+     data :  {email:email,csrf_token_name:csrf_token},
+     success:function(response)
+     {
+       if(response==1)
+       {
+         //window.location = base_url+'dashboard';
+		 
+		 $("#email_error").html("Email ID already exist...!");
+		 $("#save_profile_change").prop("disabled",true);
+       }
+       else {
+        //location.reload();
+		$("#email_error").html("");
+		$("#save_profile_change").prop("disabled",false);
+      }
+    }
+  });
+  
+  });
+  
+  
    $('#upload_images').on('click',function(){
     upload_images();
   }); 
@@ -112,7 +136,8 @@
         "bFilter": false,
       });
     }
-
+    $('.revenue_table').DataTable();
+    $('.language_table').DataTable();
     $('.categories_table').DataTable();
     $('.ratingstype_table').DataTable();
     $('.service_table').DataTable();
@@ -251,6 +276,96 @@
     return false;
 }); 
 
+
+  $('#forgotpwdadmin').bootstrapValidator({
+    fields: {
+      email:   {
+        validators:          {
+          notEmpty:              {
+            message: 'Please enter your Email ID'
+          }
+        }
+      }
+    }
+  }).on('success.form.bv', function(e) {
+
+    var email = $('#email').val();
+    $.ajax({
+     type:'POST',
+     url: base_url+'admin/login/check_forgot_pwd',
+     data :  $('#forgotpwdadmin').serialize(),
+     success:function(response)
+     {
+       if(response==1)
+       {
+         //window.location = base_url+'dashboard';
+		 $("#err_frpwd").html("Reset link has been sent to your mail ID, Check your mail.").css("color","green");
+       }
+       else {
+        //location.reload();
+		$("#err_frpwd").html("Email ID Not Exist...!").css("color","red");
+      }
+    }
+  });
+    return false;
+}); 
+
+
+
+  $('#resetpwdadmin').bootstrapValidator({
+    fields: {
+      new_password:   {
+        validators:          {
+          notEmpty:              {
+            message: 'Please enter your New Password'
+          }
+        }
+      },
+	  
+	  confirm_password:   {
+        validators:          {
+          notEmpty:              {
+            message: 'Please enter your Confirm Password'
+          }
+        }
+      }
+    }
+  }).on('success.form.bv', function(e) {
+
+    var new_password = $('#new_password').val();
+    var confirm_password = $('#confirm_password').val();
+	
+	if(new_password == confirm_password)
+	{
+		$.ajax({
+		 type:'POST',
+		 url: base_url+'admin/login/save_reset_password',
+		 data :  $('#resetpwdadmin').serialize(),
+		 success:function(response)
+		 {
+		   if(response==1)
+		   {
+			 //window.location = base_url+'dashboard';
+			 $("#err_respwd").html("Password Changed SuccessFully...!").css("color","green");
+			 window.location = base_url+'admin';
+		   }
+		   else {
+			//location.reload();
+			$("#err_respwd").html("Something went wrong...!").css("color","red");
+		  }
+		}
+	  });
+	}
+	else
+	{
+		$("#err_respwd").html("Password Mismatch...!").css("color","red");
+		
+	}
+    
+    return false;
+}); 
+
+
   $('#addSubscription').bootstrapValidator({
     fields: {
       subscription_name:   {
@@ -312,10 +427,149 @@
    });
     return false;
         }); 
+        
+  $('#add_app_keywords').bootstrapValidator({
+    fields: {
+      page_name:   {
+        validators: {
+          notEmpty: {
+            message: 'Please enter page name'
+
+          }
+        }
+      },                
+  }
+}).on('success.form.bv', function(e) {
 
 
+  return true;
+});
+
+  $('#add_language').bootstrapValidator({
+    fields: {
+      language_name:   {
+        validators: {
+          notEmpty: {
+            message: 'Please enter language name'
+
+          }
+        }
+      },
+      language_value:   {
+        validators: {
+          notEmpty: {
+            message: 'Please enter language value'
+
+          }
+        }
+      },
+      language_type:   {
+        validators: {
+          notEmpty: {
+            message: 'Please enter language type'
+
+          }
+        }
+      },                  
+  }
+}).on('success.form.bv', function(e) {
 
 
+  return true;
+});
+
+  $('#admin_settings').bootstrapValidator({
+    fields: {
+      website_name:   {
+        validators: {
+          notEmpty: {
+            message: 'Please enter website name'
+
+          }
+        }
+      },
+      contact_details:   {
+        validators: {
+          notEmpty: {
+            message: 'Please enter contact details'
+
+          }
+        }
+      },
+      mobile_number:   {
+        validators: {
+          notEmpty: {
+            message: 'Please enter mobile number'
+
+          }
+        }
+      },
+	currency_option:   {
+        validators: {
+          notEmpty: {
+            message: 'Please select currency'
+
+          }
+        }
+      },
+	commission:   {
+        validators: {
+          notEmpty: {
+            message: 'Please enter commission amount'
+
+          }
+        }
+      },
+	  
+	  login_type:   {
+        validators: {
+          notEmpty: {
+            message: 'Please select Login type'
+
+          }
+        }
+      },
+	paypal_gateway:   {
+        validators: {
+          notEmpty: {
+            message: 'Please enter paypal gateway'
+
+          }
+        }
+      },
+	braintree_key:   {
+        validators: {
+          notEmpty: {
+            message: 'Please enter braintree key'
+
+          }
+        }
+      },
+	site_logo:           {
+		   validators:           {
+			file: {
+			  extension: 'jpeg,png,jpg',
+			  type: 'image/jpeg,image/png,image/jpg',
+			  message: 'The selected file is not valid. Only allowed jpeg,jpg,png files'
+			}
+		  }
+		},
+	favicon:           {
+		   validators:           {
+			file: {
+			  extension: 'png,ico',
+			  type: 'image/png,image/ico',
+			  message: 'The selected file is not valid. Only allowed ico,png files'
+			}
+			
+		  }
+		},	
+  }
+}).on('success.form.bv', function(e) {
+
+
+  return true;
+});
 
   $('#add_category').bootstrapValidator({
     fields: {
@@ -783,19 +1037,27 @@ function upload_images(){
 function changeAdminProfile(){
 	$('#image_error').hide();
 	var profile_img = $('#crop_prof_img').val();
+	var adminmail = $('#adminmail').val();
+	
 	var error = 0;
-	if(profile_img==""){
-		error =1;
-		$('#image_error').text('Please select an image.');
-		$('#image_error').show();
-	}else{
-		$('#image_error').hide();
-	}
+	
+	
+	// if(profile_img==""){
+		// error =1;
+		// $('#image_error').text('Please select an image.');
+		// $('#image_error').show();
+	// }else{
+		// $('#image_error').hide();
+	// }
+	
+	
 	if(error==0){
 		var url = base_url+'admin/profile/update_profile';
 		//fetch file
 		var formData = new FormData();
 		formData.append('profile_img', profile_img);
+		formData.append('adminmail', adminmail);
+		formData.append('csrf_token_name', csrf_token);
 		$.ajax({
 			url: url,
 			type: "POST",
@@ -826,5 +1088,63 @@ function delete_ratings_type(id) {
 	$('#delete_ratings_type').modal('show');
 	$('#id').val(id);
 }
+
+
+ $(document).on("click", ".delete_show", function () {
+    var id=$(this).attr('data-id');
+    delete_modal_show(id);
+  });
+  
+  function delete_modal_show(id){
+    $('#delete_modal').modal('show');
+    $('#confirm_btn').attr('data-id',id);
+    $('#confirm_delete_pro').attr('data-id',id);
+	$('#confirm_btn_admin').attr('data-id',id);
+  }
+    $('#confirm_btn_admin').on('click',function(){ 
+    var id=$(this).attr('data-id');
+    var url=base_url+"admin/dashboard/adminuser_delete";
+    delete_confirm(id,url);
+  });
+   function delete_confirm(id,url){
+    if(id!=''){
+      $('#delete_modal').modal('hide');
+       $.ajax({
+     type:'POST',
+     url: url,
+     data : {id:id,csrf_token_name:csrf_token},
+     dataType:'json',
+     success:function(response)
+     {
+       if(response.status)
+       {
+        swal({
+          title: "Success..!",
+          text: response.msg,
+          icon: "success",
+          button: "okay",
+          closeOnEsc: false,
+          closeOnClickOutside: false
+        }).then(function(){
+          location.reload();
+        });
+
+      }
+      else {
+       swal({
+        title: "Error..!",
+        text: response.msg,
+        icon: "error",
+        button: "okay",
+        closeOnEsc: false,
+        closeOnClickOutside: false
+      }).then(function(){
+        location.reload();
+      });
+    }
+  }
+});
+    }
+  }
 
 })(jQuery);

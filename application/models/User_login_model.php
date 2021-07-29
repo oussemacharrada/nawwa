@@ -317,22 +317,37 @@ class User_login_model extends CI_Model
 
    public function check_mobile_no($inputs)
    {
-      $this->db->where(array('country_code'=>$inputs['countryCode']))->like('mobileno',$inputs['mobileno'],'match','after');
+      $this->db->where(array('country_code'=>$inputs['countryCode'],'status'=>1))->like('mobileno',$inputs['mobileno'],'match','after');
       return $this->db->count_all_results('providers');
    }
+   
+    public function check_emailid($inputs)
+   {
+	  $this->db->where('email',$inputs['email']);
+	  $this->db->where('status',1);
+      return $this->db->count_all_results('providers');
+   }
+   
+   
     public function check_provider_email($inputs)
    {
-
-     
       $this->db->where('email',$inputs);
       return $this->db->count_all_results('providers');
    }
 
     public function check_user_mobileno($inputs)
    {
-      $this->db->where(array('country_code'=>$inputs['countryCode']))->like('mobileno',$inputs['mobileno'],'match','after');
+      $this->db->where(array('country_code'=>$inputs['countryCode'],'status'=>1))->like('mobileno',$inputs['mobileno'],'match','after');
       return $this->db->count_all_results('users');
    }
+   
+   public function check_user_emailidlogin($inputs)
+   {
+      $this->db->where('email',$inputs['email']);
+	  $this->db->where('status',1); 
+      return $this->db->count_all_results('users');
+   }
+   
    public function check_user_emailid($inputs)
    {
 
@@ -388,6 +403,7 @@ class User_login_model extends CI_Model
               /*insert wallet*/
               $data=array(
                           "token"=>$token,
+                          "currency_code" => $input_data['currency_code'],
                           "user_provider_id"=>$user_id,
                           "type"=>1,
                           "wallet_amt"=>0,
@@ -416,7 +432,86 @@ class User_login_model extends CI_Model
       
 
    }
+	
+	
+	public function insertemailusers($input_data)
+	{
+        if($input_data)
+        {
+          $input_data['created_at'] = date('Y-m-d H:i:s');
+          $result  = $this->db->insert('users',$input_data);
+		  $last_query=$this->db->last_query();
+		 // echo $last_query;exit;
+          $records=array();
+          if($result)
+          {
+              $user_id = $this->db->insert_id();
+              $token = $this->getToken(14,$user_id);
 
+                            /*insert wallet*/
+              $data=array(
+                          "token"=>$token,
+                          "currency_code" => $input_data['currency_code'],
+                          "user_provider_id"=>$user_id,
+                          "type"=>2,
+                          "wallet_amt"=>0,
+                          "created_at"=>utc_date_conversion(date('Y-m-d H:i:s'))
+                        );
+              $wallet_result  = $this->db->insert('wallet_table',$data);
+             
+              $this->db->where('id', $user_id);
+              $this->db->update('users', array('token'=>$token));
+              $profile_img=base_url().'assets/img/professional.png';
+
+               $this->db->select('id,name,email,mobileno,IF(profile_img IS NULL or profile_img = "", "'.$profile_img.'", profile_img) as profile_img,token');
+               $this->db->where('id',$user_id);
+               $records=$this->db->get('users')->row_array();
+
+          }
+          return array('data'=>$records,'msg'=>'ok');
+		}
+   }
+   
+   
+   	public function insertemailproviders($input_data)
+	{
+        if($input_data)
+        {
+          $input_data['created_at'] = date('Y-m-d H:i:s');
+          $result  = $this->db->insert('providers',$input_data);
+		  $last_query=$this->db->last_query();
+		 // echo $last_query;exit;
+          $records=array();
+          if($result)
+          {
+              $user_id = $this->db->insert_id();
+              $token = $this->getToken(14,$user_id);
+              /*insert wallet*/
+              $data=array(
+                          "token"=>$token,
+                          "currency_code" => $input_data['currency_code'],
+                          "user_provider_id"=>$user_id,
+                          "type"=>1,
+                          "wallet_amt"=>0,
+                          "created_at"=>utc_date_conversion(date('Y-m-d H:i:s'))
+                        );
+              $wallet_result  = $this->db->insert('wallet_table',$data);
+              /*insert wallet*/
+
+              $this->db->where('id', $user_id);
+              $this->db->update('providers', array('token'=>$token));
+              $profile_img=base_url().'assets/img/professional.png';
+
+               $this->db->select('id,name,email,mobileno,category,subcategory,IF(profile_img IS NULL or profile_img = "", "'.$profile_img.'", profile_img) as profile_img,token');
+               $this->db->where('id',$user_id);
+              $records=$this->db->get('providers')->row_array();
+
+          }
+          return array('data'=>$records,'msg'=>'ok');
+		}
+   }
+   
+	
 
 
    public function otp_validation_user($user_data,$input_data)
@@ -463,6 +558,7 @@ class User_login_model extends CI_Model
                             /*insert wallet*/
               $data=array(
                           "token"=>$token,
+                          "currency_code" => $input_data['currency_code'],
                           "user_provider_id"=>$user_id,
                           "type"=>2,
                           "wallet_amt"=>0,
@@ -491,7 +587,27 @@ class User_login_model extends CI_Model
       
 
    }
+   
+   
+   
 
+ public function check_emaillogin($check_data)
+   {
+         $this->db->select('*');
+         $this->db->where($check_data);
+         $res = $this->db->get('providers')->row_array();  
+         return array('data'=>$res,'msg'=>'ok');       
+   }
+   
+    public function check_emailloginuser($check_data)
+   {
+         $this->db->select('*');
+         $this->db->where($check_data);
+         $res = $this->db->get('users')->row_array();  
+         return array('data'=>$res,'msg'=>'ok');       
+   }
+   
+   
 
    public function check_otp($check_data)
    {
@@ -545,6 +661,30 @@ class User_login_model extends CI_Model
        return $record;    
 
       }
+	  
+	public function get_provider_detailsbymail($email)
+    {
+
+      
+       $record = $this->db->where('email',$email)->get('providers')->row_array(); 
+       
+       return $record;    
+
+      }
+	  
+	  	public function get_provider_detailsbymailuser($email)
+    {
+
+      
+       $record = $this->db->where('email',$email)->get('users')->row_array(); 
+       
+       return $record;    
+
+      }
+	  
+	  
+	  
+	  
 
     public function get_user_details($mobile_number)
     {
@@ -586,6 +726,62 @@ class User_login_model extends CI_Model
         return $records;
  
    }
+   
+   public function ShareCode($length,$user_id)
+   {
+       $token = $user_id;
+
+//       $codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+       $codeAlphabet= "abcdefghijklmnopqrstuvwxyz";
+       $codeAlphabet.= "0123456789";
+
+       $max = strlen($codeAlphabet); // edited
+
+    for ($i=0; $i < $length; $i++) {
+         $token .= $codeAlphabet[$this->crypto_rand_secure(0, $max-1)];
+
+    }
+
+    return $token;
+   }
+   
+   public function check_user_emaildet($email)
+	  {
+		$this->db->select('*');
+		$this->db->from('users');
+			$this->db->where('email',$email);
+			//$this->db->where_in('type',2);
+		  $result = $this->db->get()->row_array();
+		return $result;
+	  }
+   
+      public function check_provider_emaildet($email)
+	  {
+		$this->db->select('*');
+		$this->db->from('providers');
+			$this->db->where('email',$email);
+			//$this->db->where_in('type',2);
+		  $result = $this->db->get()->row_array();
+		return $result;
+	  }
+	  
+	  public function update_res_userpwd($data, $id) {
+		$this->db->where('id',$id);
+		$status = $this->db->update('users', $data);
+		return $status;
+
+		}
+		
+		public function update_res_providerpwd($data, $id) {
+		$this->db->where('id',$id);
+		$status = $this->db->update('providers', $data);
+		return $status;
+
+		}
+   
+   
+   
+   
 
 
       

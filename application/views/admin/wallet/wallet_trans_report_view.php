@@ -131,7 +131,7 @@ $all_member=array_merge($user_list,$provider_list);
                                     $i=1;
                                     foreach ($list as $rows) {
 									if(!empty($rows['date'])){
-										$date=date('d M Y');
+										$date =date('d M Y H:i:s', strtotime($rows['date']));
 									}else{
 										$date='-';
 									}
@@ -162,11 +162,11 @@ $all_member=array_merge($user_list,$provider_list);
 											</h2>
 										</td>
 										<td>'.$rows['user_mobile'].'</td>
-										<td>'.$rows['current_wallet'].'</td>
-										<td>'.$rows['credit_wallet'].'</td>
-										<td>'.$rows['debit_wallet'].'</td>
-										<td>'.$rows['fee_amt'].'</td>
-										<td>'.$rows['avail_wallet'].'</td>
+										<td>'.currency_conversion($rows['currency_code']).$rows['current_wallet'].'</td>
+										<td>'.currency_conversion($rows['currency_code']).$rows['credit_wallet'].'</td>
+										<td>'.currency_conversion($rows['currency_code']).$rows['debit_wallet'].'</td>
+										<td>'.currency_conversion($rows['currency_code']).$rows['fee_amt'].'</td>
+										<td>'.currency_conversion($rows['currency_code']).$rows['avail_wallet'].'</td>
 										<td>'.$rows['reason'].'</td>
 										<td><span class="btn btn-sm btn-'.$color_t.'">'.$message_t.'</span></td> 
 										<td><label class="badge badge-'.$color.'">'.ucfirst($role).'</lable></td>

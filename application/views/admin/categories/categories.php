@@ -106,6 +106,7 @@
 									<a href="'.base_url().'edit-category/'.$rows['id'].'" class="btn btn-sm bg-success-light mr-2">
 										<i class="far fa-edit mr-1"></i> Edit
 									</a>
+									<a href="javascript:;" class="on-default remove-row btn btn-sm bg-danger-light mr-2 delete_categories" id="Onremove_'.$rows['id'].'" data-id="'.$rows['id'].'"><i class="far fa-trash-alt mr-1"></i> Delete</a>
 								</td>
 								</tr>';
 							

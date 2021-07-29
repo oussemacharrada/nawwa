@@ -34,6 +34,7 @@ class Wallet_model extends CI_Model
              $wallet[$key]['user_email']=$user_info['email'];
              $wallet[$key]['user_image']=$profile_img;
              $wallet[$key]['wallet_amt']=$value['wallet_amt'];
+			 $wallet[$key]['currency_code']=$value['currency_code'];
              $wallet[$key]['token']=$value['token'];
              $wallet[$key]['date']=$value['created_at'];
              $wallet[$key]['role']=$value['type'];
@@ -93,6 +94,7 @@ class Wallet_model extends CI_Model
              $wallet[$key]['user_email']=$user_info['email'];
              $wallet[$key]['user_image']=$profile_img;
              $wallet[$key]['wallet_amt']=$value['wallet_amt'];
+			 $wallet[$key]['currency_code']=$value['currency_code'];
              $wallet[$key]['token']=$value['token'];
              $wallet[$key]['date']=$value['created_at'];
              $wallet[$key]['role']=$value['type'];
@@ -105,7 +107,7 @@ class Wallet_model extends CI_Model
 
   public function get_wallet_history(){
     
-    $val=$this->db->select('id,token,user_provider_id,type,current_wallet,credit_wallet,debit_wallet,avail_wallet,total_amt,fee_amt,reason,created_at')->from('wallet_transaction_history')->order_by('id','DESC')->get()->result_array();
+    $val=$this->db->select('id,token,user_provider_id,type,currency_code,current_wallet,credit_wallet,debit_wallet,avail_wallet,total_amt,fee_amt,reason,created_at')->from('wallet_transaction_history')->order_by('id','DESC')->get()->result_array();
 
      $wallet=[];
         if(!empty($val)){
@@ -132,7 +134,7 @@ class Wallet_model extends CI_Model
              $wallet[$key]['user_mobile']=$user_info['mobileno'];
              $wallet[$key]['user_email']=$user_info['email'];
              $wallet[$key]['user_image']=$profile_img;
-             
+             $wallet[$key]['currency_code']=$value['currency_code'];
              $wallet[$key]['current_wallet']=$value['current_wallet'];
              $wallet[$key]['credit_wallet']=$value['credit_wallet'];
              $wallet[$key]['debit_wallet']=$value['debit_wallet'];
@@ -164,7 +166,7 @@ class Wallet_model extends CI_Model
               $to_date='';
               }
     
-    $this->db->select('id,token,user_provider_id,type,current_wallet,credit_wallet,debit_wallet,avail_wallet,total_amt,fee_amt,reason,created_at');
+    $this->db->select('id,token,user_provider_id,type,currency_code,current_wallet,credit_wallet,debit_wallet,avail_wallet,total_amt,fee_amt,reason,created_at');
     $this->db->from('wallet_transaction_history');
 
 
@@ -205,7 +207,7 @@ class Wallet_model extends CI_Model
              $wallet[$key]['user_mobile']=$user_info['mobileno'];
              $wallet[$key]['user_email']=$user_info['email'];
              $wallet[$key]['user_image']=$profile_img;
-             
+             $wallet[$key]['currency_code']=$value['currency_code'];
              $wallet[$key]['current_wallet']=$value['current_wallet'];
              $wallet[$key]['credit_wallet']=$value['credit_wallet'];
              $wallet[$key]['debit_wallet']=$value['debit_wallet'];

@@ -12,7 +12,7 @@ class Post extends CI_Model{
      * @param array filter data based on the passed parameters 
      */ 
     function getRows($params = array()){ 
-        $this->db->select("services.id,services.user_id,services.service_title,services.service_amount,services.mobile_image,c.category_name,sc.subcategory_name,services.rating_count,services.service_location"); 
+        $this->db->select("services.currency_code,services.id,services.user_id,services.service_title,services.service_amount,services.mobile_image,c.category_name,sc.subcategory_name,services.rating_count,services.service_location"); 
         $this->db->from($this->table); 
            $this->db->join('categories c', 'c.id = services.category', 'LEFT');
           $this->db->join('subcategories sc', 'sc.id = services.subcategory', 'LEFT');
@@ -50,7 +50,7 @@ class Post extends CI_Model{
         return $result; 
     } 
      function getInactiveRows($params = array()){ 
-        $this->db->select("services.id,services.user_id,services.service_title,services.service_amount,services.mobile_image,c.category_name,sc.subcategory_name,services.rating_count,services.service_location"); 
+        $this->db->select("services.currency_code,services.id,services.user_id,services.service_title,services.service_amount,services.mobile_image,c.category_name,sc.subcategory_name,services.rating_count,services.service_location"); 
         $this->db->from($this->table); 
            $this->db->join('categories c', 'c.id = services.category', 'LEFT');
           $this->db->join('subcategories sc', 'sc.id = services.subcategory', 'LEFT');

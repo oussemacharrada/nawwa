@@ -104,7 +104,8 @@
                                         <th>Contact No</th>
                                         <th>Email</th>
                                         <th>Reg Date</th>
-                                        <th>Subscription</th>
+										<th>Subscription</th>
+										<th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -114,9 +115,11 @@
 									foreach ($lists as $rows) {
 										if($rows['status']==1) {
 											$val='checked';
+											$tag='data-toggle="tooltip" title="Click to Deactivate Provider ..!"';
 										}
 										else {
 											$val='';
+											$tag='data-toggle="tooltip" title="Click to Activate Provider ..!"';
 										}
 										$profile_img = $rows['profile_img'];
 										if(empty($profile_img)){
@@ -135,6 +138,14 @@
 											<td>'.$rows['email'].'</td>
 											<td>'.$date.'</td>
 											<td>'.$rows['subscription_name'].'</td>
+											<td>
+											<div '.$tag.'>
+												<div class="status-toggle">
+													<input '.$attr.' disabled id="status_'.$rows['id'].'" class="check change_Status_provider1" data-id="'.$rows['id'].' type="checkbox" '.$val.'>
+													<label for="status_'.$rows['id'].'" class="checktoggle">checkbox</label>
+												</div>
+											</div>
+											</td>
 										</tr>';
 									}
                                     }

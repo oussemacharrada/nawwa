@@ -1,12 +1,72 @@
 ﻿<?php
 $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get('country_table')->result_array();
+$query1 = $this->db->query(" SELECT * FROM `footer_menu` WHERE `status` =  1 ");
+if($query1) {
+	$footer_main_menu = $query1->result_array();
+}
+else {
+	$footer_main_menu =array();
+}
+$query2 = $this->db->query(" SELECT * FROM `footer_submenu` WHERE `status` =  1 ");
+if($query2) {
+	$footer_sub_menu = $query2->result_array();
+}
+else {
+	$footer_sub_menu =array();
+}
 ?>
+
+<?php 
+	$query = $this->db->query("select * from system_settings WHERE status = 1");
+	$result = $query->result_array();
+	$stripe_option='1';
+	$publishable_key='';
+	$live_publishable_key='';
+	$logo_front='';
+	$login_type='';
+	foreach ($result as $res) {
+		if($res['key'] == 'stripe_option'){
+			$stripe_option = $res['value'];
+		} 
+		if($res['key'] == 'publishable_key'){
+			$publishable_key = $res['value'];
+		} 
+		if($res['key'] == 'live_publishable_key'){
+			$live_publishable_key = $res['value'];
+		} 
+
+		if($res['key'] == 'login_type'){
+			$login_type = $res['value'];
+		}
+		
+		if($res['key'] == 'login_type'){
+			$login_type = $res['value'];
+		}
+		if ($res['key'] == 'map_key') {
+			$map_key = $res['value'];
+		}
+
+	}
+
+	if($stripe_option==1){
+		$stripe_key= $publishable_key;
+	}else{
+		$stripe_key= $live_publishable_key;
+	}
+
+	if(!empty($logo_front)){
+		$web_log=base_url().$logo_front;
+	}else{
+		$web_log=base_url().'assets/img/logo.png';
+	}
+//echo "<pre>";print_r($login_type);exit;
+	?>
 <!-- Review Modal -->
 <div class="modal fade" id="myReview">
 	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">	
-				<h5 class="modal-title">Write a review</h5>
+				<h5 class="modal-title"><?php echo (!empty($user_language[$user_selected]['lg_Write_review'])) ? $user_language[$user_selected]['lg_Write_review'] : $default_language['en']['lg_Write_review']; ?></h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -14,7 +74,7 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 			<div class="modal-body">
 
 				<div class="form-group">
-					<label>Review</label>
+					<label><?php echo (!empty($user_language[$user_selected]['lg_Reviews'])) ? $user_language[$user_selected]['lg_Reviews'] : $default_language['en']['lg_Reviews']; ?></label>
 					<div class="star-rating rate">
 						<input class="rates" id="star5" type="radio" name="rates" value="5">
 						<label for="star5" title="5 stars">
@@ -38,7 +98,7 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 						</label>
 					</div>
 				</div>
-				<p class="error_rating error" >Rating is required</p>
+				<p class="error_rating error" ><?php echo (!empty($user_language[$user_selected]['lg_Rating_required'])) ? $user_language[$user_selected]['lg_Rating_required'] : $default_language['en']['lg_Rating_required']; ?></p>
 				<input type="hidden" id="myInput">
 				<input type="hidden" id="booking_id">
 				<input type="hidden" id="provider_id">
@@ -47,7 +107,7 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 				
 				<?php $rating_type = $this->db->where('status',1)->get('rating_type')->result_array(); ?>
 				<div class="form-group">
-					<label>Title of your review</label>
+					<label><?php echo (!empty($user_language[$user_selected]['lg_Title_of_review_label'])) ? $user_language[$user_selected]['lg_Title_of_review_label'] : $default_language['en']['lg_Title_of_review_label']; ?></label>
 					<select name="type" id="type" class="form-control">
 						<?php foreach ($rating_type as $type) 
 						{
@@ -55,15 +115,15 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 							<option value="<?=$type['id']?>"><?php echo $type['name']?></option>
 						<?php } ?>
 					</select>
-					<p class="error_type error" >Rating type is required</p>
+					<p class="error_type error" ><?php echo (!empty($user_language[$user_selected]['lg_Rating_type_required'])) ? $user_language[$user_selected]['lg_Rating_type_required'] : $default_language['en']['lg_Rating_type_required']; ?></p>
 				</div>
 				<div class="form-group">
-					<label>Your review</label>
+					<label><?php echo (!empty($user_language[$user_selected]['lg_Your_review'])) ? $user_language[$user_selected]['lg_Your_review'] : $default_language['en']['lg_Your_review']; ?></label>
 					<textarea class="form-control" rows="4" id="review"></textarea>
-					<p class="error_review error">Review is required</p>
+					<p class="error_review error"><?php echo (!empty($user_language[$user_selected]['lg_Review_required'])) ? $user_language[$user_selected]['lg_Review_required'] : $default_language['en']['lg_Review_required']; ?></p>
 				</div>
 				<div class="text-center">
-					<button type="button" class="btn btn-theme py-2 px-4 text-white mx-auto" id="rate_booking" >SUBMIT</button>
+					<button type="button" class="btn btn-theme py-2 px-4 text-white mx-auto" id="rate_booking" ><?php echo (!empty($user_language[$user_selected]['lg_Submit'])) ? $user_language[$user_selected]['lg_Submit'] : $default_language['en']['lg_Submit']; ?></button>
 				</div>
 			</div>
 		</div>
@@ -76,7 +136,7 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title">Reason for Cancel</h5>
+				<h5 class="modal-title"><?php echo (!empty($user_language[$user_selected]['lg_Reason_Cancel'])) ? $user_language[$user_selected]['lg_Reason_Cancel'] : $default_language['en']['lg_Reason_Cancel']; ?></h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -89,15 +149,15 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 				<input type="hidden" id="cancel_service_id">
 				
 				<div class="form-group">
-					<label>Reason</label>
+					<label><?php echo (!empty($user_language[$user_selected]['lg_Reason_label'])) ? $user_language[$user_selected]['lg_Reason_label'] : $default_language['en']['lg_Reason_label']; ?></label>
 					<textarea class="form-control" rows="5" id="cancel_review"></textarea>
-					<p class="error_cancel error" >Reason is required</p>
+					<p class="error_cancel error" ><?php echo (!empty($user_language[$user_selected]['lg_Reason_required'])) ? $user_language[$user_selected]['lg_Reason_required'] : $default_language['en']['lg_Reason_required']; ?></p>
 				</div>
 				<div class="text-center">
 					<?php if($this->session->userdata('type')=="user"){?>
-						<button type="button" class="btn btn-theme py-2 px-4 text-white mx-auto" id="cancel_booking" >SUBMIT</button>
+						<button type="button" class="btn btn-theme py-2 px-4 text-white mx-auto" id="cancel_booking" ><?php echo (!empty($user_language[$user_selected]['lg_Submit'])) ? $user_language[$user_selected]['lg_Submit'] : $default_language['en']['lg_Submit']; ?></button>
 					<?php }else{?>
-						<button type="button" class="btn btn-theme py-2 px-4 text-white mx-auto" id="provider_cancel_booking">SUBMIT</button>
+						<button type="button" class="btn btn-theme py-2 px-4 text-white mx-auto" id="provider_cancel_booking"><?php echo (!empty($user_language[$user_selected]['lg_Submit'])) ? $user_language[$user_selected]['lg_Submit'] : $default_language['en']['lg_Submit']; ?></button>
 					<?php }?>
 				</div>
 			</div>
@@ -111,13 +171,13 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Alert</h4>
+				<h4 class="modal-title"><?php echo (!empty($user_language[$user_selected]['lg_Alert'])) ? $user_language[$user_selected]['lg_Alert'] : $default_language['en']['lg_Alert']; ?></h4>
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 			</div>
 			<div class="modal-body">
 				<div class="form-group">
-					<p>Please Enter Profile informations.</p>
-					<button type="button" class="btn btn-primary" id="go_user_settings">Ok</button>
+					<p><?php echo (!empty($user_language[$user_selected]['lg_Please_Enter_Profile_informations'])) ? $user_language[$user_selected]['lg_Please_Enter_Profile_informations'] : $default_language['en']['lg_Please_Enter_Profile_informations']; ?></p>
+					<button type="button" class="btn btn-primary" id="go_user_settings"><?php echo (!empty($user_language[$user_selected]['lg_Ok'])) ? $user_language[$user_selected]['lg_Ok'] : $default_language['en']['lg_Ok']; ?></button>
 				</div>
 			</div>
 		</div>
@@ -130,13 +190,13 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Alert</h4>
+				<h4 class="modal-title"><?php echo (!empty($user_language[$user_selected]['lg_Alert'])) ? $user_language[$user_selected]['lg_Alert'] : $default_language['en']['lg_Alert']; ?></h4>
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 			</div>
 			<div class="modal-body">
 				<div class="form-group">
-					<p>Please Fill Account Informations.</p>
-					<button type="button" class="btn btn-primary go_provider_availability">Ok</button>
+					<p><?php echo (!empty($user_language[$user_selected]['lg_Please_Fill_Account_Informations'])) ? $user_language[$user_selected]['lg_Please_Fill_Account_Informations'] : $default_language['en']['lg_Please_Fill_Account_Informations']; ?></p>
+					<button type="button" class="btn btn-primary go_provider_availability"><?php echo (!empty($user_language[$user_selected]['lg_Ok'])) ? $user_language[$user_selected]['lg_Ok'] : $default_language['en']['lg_Ok']; ?></button>
 				</div>
 			</div>
 
@@ -150,13 +210,13 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Alert</h4>
+				<h4 class="modal-title"><?php echo (!empty($user_language[$user_selected]['lg_Alert'])) ? $user_language[$user_selected]['lg_Alert'] : $default_language['en']['lg_Alert']; ?></h4>
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 			</div>
 			<div class="modal-body">
 				<div class="form-group">
-					<p>Please Subscripe your Plan...</p>
-					<button type="button" class="btn btn-primary go_provider_availability" >Ok</button>
+					<p><?php echo (!empty($user_language[$user_selected]['lg_Please_Subscripe'])) ? $user_language[$user_selected]['lg_Please_Subscripe'] : $default_language['en']['lg_Please_Subscripe']; ?></p>
+					<button type="button" class="btn btn-primary go_provider_availability" ><?php echo (!empty($user_language[$user_selected]['lg_Ok'])) ? $user_language[$user_selected]['lg_Ok'] : $default_language['en']['lg_Ok']; ?></button>
 				</div>
 			</div>
 
@@ -169,15 +229,15 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Alert</h4>
+				<h4 class="modal-title"><?php echo (!empty($user_language[$user_selected]['lg_Alert'])) ? $user_language[$user_selected]['lg_Alert'] : $default_language['en']['lg_Alert']; ?></h4>
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 			</div>
 			<div class="modal-body">
 
 				<div class="form-group">
-					<p>Please Fill Availability time.</p>
+					<p><?php echo (!empty($user_language[$user_selected]['lg_Please_Fill_Availability'])) ? $user_language[$user_selected]['lg_Please_Fill_Availability'] : $default_language['en']['lg_Please_Fill_Availability']; ?></p>
 
-					<button type="button" class="btn btn-primary go_provider_availability" >Ok</button>
+					<button type="button" class="btn btn-primary go_provider_availability" ><?php echo (!empty($user_language[$user_selected]['lg_Ok'])) ? $user_language[$user_selected]['lg_Ok'] : $default_language['en']['lg_Ok']; ?></button>
 				</div>
 			</div>
 
@@ -212,13 +272,13 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 					<div class="account-box">
 						<div class="login-right">
 							<div class="login-header">
-								<h3>Join as a Professional</h3>
-								<p class="text-muted">Registration for Provider</p>
+								<h3><?php echo (!empty($user_language[$user_selected]['lg_Join_Professional'])) ? $user_language[$user_selected]['lg_Join_Professional'] : $default_language['en']['lg_Join_Professional']; ?></h3>
+								<p class="text-muted"><?php echo (!empty($user_language[$user_selected]['lg_Registration_Provider'])) ? $user_language[$user_selected]['lg_Registration_Provider'] : $default_language['en']['lg_Registration_Provider']; ?></p>
 							</div>
 						</div>
-						<label>What Service do you Provide?</label>                
+						<label><?php echo (!empty($user_language[$user_selected]['lg_What_Service_do_you_Provide'])) ? $user_language[$user_selected]['lg_What_Service_do_you_Provide'] : $default_language['en']['lg_What_Service_do_you_Provide']; ?></label>                
 						<select class="form-control" title="Category" name="categorys" id="categorys">
-							<option value='' >Select your service here...</option>
+							<option value='' ><?php echo (!empty($user_language[$user_selected]['lg_Select_your_service'])) ? $user_language[$user_selected]['lg_Select_your_service'] : $default_language['en']['lg_Select_your_service']; ?></option>
 						</select>
 						<span class="category_error"></span>
 					</div>
@@ -230,14 +290,14 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 					<div class="account-box">
 						<div class="login-right">
 							<div class="login-header">
-								<h3>Join as a Professional</h3>
-								<p class="text-muted">Registration for Provider</p>
+								<h3><?php echo (!empty($user_language[$user_selected]['lg_Join_Professional'])) ? $user_language[$user_selected]['lg_Join_Professional'] : $default_language['en']['lg_Join_Professional']; ?></h3>
+								<p class="text-muted"><?php echo (!empty($user_language[$user_selected]['lg_Registration_Provider'])) ? $user_language[$user_selected]['lg_Registration_Provider'] : $default_language['en']['lg_Registration_Provider']; ?></p>
 							</div>
 						</div>
 						<form id="new_second_page">
-							<label>Choose the Sub Category</label>
+							<label><?php echo (!empty($user_language[$user_selected]['lg_Choose_the_Sub_Category'])) ? $user_language[$user_selected]['lg_Choose_the_Sub_Category'] : $default_language['en']['lg_Choose_the_Sub_Category']; ?></label>
 							<select class="form-control" title="Sub Category" name="subcategorys" id="subcategorys">
-								<option value=''>Enter your sub category...</option>
+								<option value=''><?php echo (!empty($user_language[$user_selected]['lg_Enter_your_sub_category'])) ? $user_language[$user_selected]['lg_Enter_your_sub_category'] : $default_language['en']['lg_Enter_your_sub_category']; ?></option>
 							</select>
 						</form>
 					</div>
@@ -249,21 +309,30 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 					<div class="account-box">
 						<div class="login-right">
 							<div class="login-header">
-								<h3>Join as a Professional</h3>
-								<p class="text-muted">Registration for Provider</p>
+								<h3><?php echo (!empty($user_language[$user_selected]['lg_Join_Professional'])) ? $user_language[$user_selected]['lg_Join_Professional'] : $default_language['en']['lg_Join_Professional']; ?></h3>
+								<p class="text-muted"><?php echo (!empty($user_language[$user_selected]['lg_Registration_Provider'])) ? $user_language[$user_selected]['lg_Registration_Provider'] : $default_language['en']['lg_Registration_Provider']; ?></p>
 							</div>
 						</div>
 						<form action="" method='post' id="new_third_page">
 							<div class="form-group">
-								<label>Name</label>
+								<label><?php echo (!empty($user_language[$user_selected]['lg_Name'])) ? $user_language[$user_selected]['lg_Name'] : $default_language['en']['lg_Name']; ?></label>
 								<input type="text" class="form-control" name="userName" id='userName'>
 							</div>
 							<div class="form-group">
-								<label>Email</label>
+								<label><?php echo (!empty($user_language[$user_selected]['lg_Email'])) ? $user_language[$user_selected]['lg_Email'] : $default_language['en']['lg_Email']; ?></label>
 								<input type="text" class="form-control" name="userEmail" id='userEmail'>
+								<input type="hidden" class="form-control" name="userLogintype" id='user_logintype' value="<?=$login_type?>" >
 							</div>
+							<?php 
+								if($login_type=='email'){
+								?>
+								<div class="form-group">
+									<label><?php echo (!empty($user_language[$user_selected]['lg_Password_Label'])) ? $user_language[$user_selected]['lg_Password_Label'] : $default_language['en']['lg_Password_Label']; ?></label>
+									<input type="password" class="form-control" name="userPassword" id='UserPassword'>
+								</div>
+								<?php } ?>
 							<div class="form-group">
-								<label>Mobile Number</label>
+								<label><?php echo (!empty($user_language[$user_selected]['lg_Mobile_Number'])) ? $user_language[$user_selected]['lg_Mobile_Number'] : $default_language['en']['lg_Mobile_Number']; ?></label>
 								<div class="row">
 									<div class="col-4 pr-0">
 										<select name="countryCode" id="countryCode" class="form-control countryCode final_provider_c_code">
@@ -282,14 +351,14 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 							<div class="form-group">
 								<div class="custom-control custom-control-xs custom-checkbox">
 									<input type="checkbox" class="custom-control-input" name="agreeCheckbox" id="agree_checkbox" value="1">
-									<label class="custom-control-label" for="agree_checkbox">I agree to <?=settingValue('website_name')?></label> <a tabindex="-1" href="javascript:void(0);">Privacy Policy</a> &amp; <a tabindex="-1" href="javascript:void(0);"> Terms.</a>
+									<label class="custom-control-label" for="agree_checkbox"><?php echo (!empty($user_language[$user_selected]['lg_agree'])) ? $user_language[$user_selected]['lg_agree'] : $default_language['en']['lg_agree']; ?> <?=settingValue('website_name')?></label> <a tabindex="-1" href="javascript:void(0);"><?php echo (!empty($user_language[$user_selected]['lg_Privacy_Policy'])) ? $user_language[$user_selected]['lg_Privacy_Policy'] : $default_language['en']['lg_Privacy_Policy']; ?></a> &amp; <a tabindex="-1" href="javascript:void(0);"> <?php echo (!empty($user_language[$user_selected]['lg_Terms'])) ? $user_language[$user_selected]['lg_Terms'] : $default_language['en']['lg_Terms']; ?></a>
 								</div>
 							</div>
 							<div class="form-group">
-								<button id="registration_submit" type="submit" class="btn login-btn">Register</button>
+								<button id="registration_submit" type="submit" class="btn login-btn"><?php echo (!empty($user_language[$user_selected]['lg_Register'])) ? $user_language[$user_selected]['lg_Register'] : $default_language['en']['lg_Register']; ?></button>
 							</div>
 							<div class="account-footer text-center">
-								Already have an account? <a href="javascript:void(0);" data-dismiss="modal" data-toggle="modal" data-target="#tab_login_modal">Login</a>
+								<?php echo (!empty($user_language[$user_selected]['Already_Have_An_Account_lg'])) ? $user_language[$user_selected]['Already_Have_An_Account_lg'] : $default_language['en']['Already_Have_An_Account_lg']; ?> <a href="javascript:void(0);" data-dismiss="modal" data-toggle="modal" data-target="#tab_login_modal"><?php echo (!empty($user_language[$user_selected]['lg_login'])) ? $user_language[$user_selected]['lg_login'] : $default_language['en']['lg_login']; ?></a>
 							</div>
 						</form> 
 					</div>
@@ -299,15 +368,15 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 			<div class="modal-body step-4" data-step="4">
 				<div class="login-header">
 					<h3>OTP</h3>
-					<p class="text-muted">Verification your account</p>
+					<p class="text-muted"><?php echo (!empty($user_language[$user_selected]['lg_Verification_account'])) ? $user_language[$user_selected]['lg_Verification_account'] : $default_language['en']['lg_Verification_account']; ?></p>
 				</div>
 				<form action="<?php echo base_url()?>user/login/send_otp_request" method='post' id="new_fourth_page">
 					<div class="form-group">
 						<input type="hidden" class="form-control form-control-lg" placeholder="Mobile Number" name='enteredMobile' id='enteredMobile'>
 					</div>
 					<div class="alert alert-success text-center" role="alert">
-						<strong>We Have Send SMS Via OTP</strong>
-						<strong>Please Check Your Registered Mobile Number </strong>
+						<strong><?php echo (!empty($user_language[$user_selected]['lg_We Have_OTP'])) ? $user_language[$user_selected]['lg_We Have_OTP'] : $default_language['en']['lg_We Have_OTP']; ?></strong>
+						<strong><?php echo (!empty($user_language[$user_selected]['lg_Registration_Provider'])) ? $user_language[$user_selected]['lg_Registration_Provider'] : $default_language['en']['lg_Registration_Provider']; ?> </strong>
 					</div>
 					<?php if(settingValue('default_otp')==1){ ?>
 					<div class="alert alert-danger text-center" role="alert">
@@ -316,22 +385,22 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 				<?php }?>
 					<div class="form-group">
 						<input  type="text" class="form-control form-control-lg no_only" maxlength="4" autocomplete="off" minlength="4" placeholder=" Enter OTP Here...." name="otp_number" id='otp_number'>
-						<span for='otp_number' id='otp_error_msg'></span>
+						<span for='otp_number' id='otp_error_msg'><?php echo (!empty($user_language[$user_selected]['lg_Please_Check_Your_Registered_Mobile'])) ? $user_language[$user_selected]['lg_Please_Check_Your_Registered_Mobile'] : $default_language['en']['lg_Please_Check_Your_Registered_Mobile']; ?></span>
 					</div>
-					<p class="resend-otp">Didn't receive the OTP? <a href="#" id="re_send_otp_provider" > Resend OTP</a></p>
+					<p class="resend-otp"><?php echo (!empty($user_language[$user_selected]['lg_Didnt_receive_the_OTP'])) ? $user_language[$user_selected]['lg_Didnt_receive_the_OTP'] : $default_language['en']['lg_Didnt_receive_the_OTP']; ?> <a href="#" id="re_send_otp_provider" > <?php echo (!empty($user_language[$user_selected]['lg_Resend_OTP'])) ? $user_language[$user_selected]['lg_Resend_OTP'] : $default_language['en']['lg_Resend_OTP']; ?></a></p>
 					<div>
-						<button id='registration_final_old' type="submit" class="login-btn" >Finish</button>
+						<button id='registration_final_old' type="submit" class="login-btn" ><?php echo (!empty($user_language[$user_selected]['lg_Finish'])) ? $user_language[$user_selected]['lg_Finish'] : $default_language['en']['lg_Finish']; ?></button>
 					</div>
 					<div>
-						<button id='registration_resend_new' type="button" class="invisible login-btn" >Resend</button>
+						<button id='registration_resend_new' type="button" class="invisible login-btn" ><?php echo (!empty($user_language[$user_selected]['lg_Resend'])) ? $user_language[$user_selected]['lg_Resend'] : $default_language['en']['lg_Resend']; ?></button>
 					</div>
 				</form> 
 			</div>
 
 			<div class="modal-footer mx-auto">
-				<button type="button" class="btn btn-theme text-white px-5 py-2 mt-0 mb-4 step step-1" disabled="disabled" id='step1_footer' data-step="2">Continue</button>
-				<button type="button" class="btn btn-theme text-white px-5 py-2 mt-0 mb-4 step step-2"  id='step2_footer' data-step="1" >Back</button>
-				<button type="button" class="btn btn-theme text-white px-5 py-2 mt-0 mb-4 step step-2"  disabled="disabled" id='step3_footer' data-step="3" >Continue</button>
+				<button type="button" class="btn btn-theme text-white px-5 py-2 mt-0 mb-4 step step-1" disabled="disabled" id='step1_footer' data-step="2"><?php echo (!empty($user_language[$user_selected]['lg_Continue'])) ? $user_language[$user_selected]['lg_Continue'] : $default_language['en']['lg_Continue']; ?></button>
+				<button type="button" class="btn btn-theme text-white px-5 py-2 mt-0 mb-4 step step-2"  id='step2_footer' data-step="1" ><?php echo (!empty($user_language[$user_selected]['lg_back'])) ? $user_language[$user_selected]['lg_back'] : $default_language['en']['lg_back']; ?></button>
+				<button type="button" class="btn btn-theme text-white px-5 py-2 mt-0 mb-4 step step-2"  disabled="disabled" id='step3_footer' data-step="3" ><?php echo (!empty($user_language[$user_selected]['lg_Continue'])) ? $user_language[$user_selected]['lg_Continue'] : $default_language['en']['lg_Continue']; ?></button>
 			</div>
 		</div>
 	</div>
@@ -354,21 +423,30 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 					<div class="account-box">
 						<div class="login-right">
 							<div class="login-header">
-								<h3>Join as a User</h3>
-								<p class="text-muted">Registration for Customer</p>
+								<h3><?php echo (!empty($user_language[$user_selected]['Join_as_a_user'])) ? $user_language[$user_selected]['Join_as_a_user'] : $default_language['en']['Join_as_a_user']; ?></h3>
+								<p class="text-muted"><?php echo (!empty($user_language[$user_selected]['Registration_for_custome_lg'])) ? $user_language[$user_selected]['Registration_for_custome_lg'] : $default_language['en']['Registration_for_custome_lg']; ?></p>
 							</div> 
 
 							<form method='post' id="new_third_page_user">
 								<div class="form-group">
-									<label>Name</label>
+									<label><?php echo (!empty($user_language[$user_selected]['lg_Name'])) ? $user_language[$user_selected]['lg_Name'] : $default_language['en']['lg_Name']; ?></label>
 									<input type="text" class="form-control" name="userName" id='user_name'>
 								</div>
 								<div class="form-group">
-									<label>Email</label>
+									<label><?php echo (!empty($user_language[$user_selected]['lg_Email'])) ? $user_language[$user_selected]['lg_Email'] : $default_language['en']['lg_Email']; ?></label>
 									<input type="email" class="form-control" name="userEmail" id='user_email'>
+									<input type="hidden" class="form-control" name="userLogintype" id='user_logintype' value="<?=$login_type?>" >
 								</div>
+								<?php 
+								if($login_type=='email'){
+								?>
 								<div class="form-group">
-									<label>Mobile Number</label>
+									<label><?php echo (!empty($user_language[$user_selected]['lg_Password'])) ? $user_language[$user_selected]['lg_Password'] : $default_language['en']['lg_Password']; ?></label>
+									<input type="password" class="form-control" name="userPassword" id='user_password'>
+								</div>
+								<?php } ?>
+								<div class="form-group">
+									<label><?php echo (!empty($user_language[$user_selected]['lg_Mobile_Number'])) ? $user_language[$user_selected]['lg_Mobile_Number'] : $default_language['en']['lg_Mobile_Number']; ?></label>
 									<div class="row">
 										<div class="col-4 pr-0">
 											<select name="countryCode" id="country_code" class="form-control countryCode final_country_code">
@@ -387,14 +465,14 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 								<div class="form-group">
 									<div class="custom-control custom-control-xs custom-checkbox">
 										<input type="checkbox" class="custom-control-input" name="agreeCheckboxUser" id="agree_checkbox_user" value="1">
-										<label class="custom-control-label" for="agree_checkbox_user">I agree to <?=settingValue('website_name')?></label> <a tabindex="-1" href="javascript:void(0);">Privacy Policy</a> &amp; <a tabindex="-1" href="javascript:void(0);"> Terms.</a>
+										<label class="custom-control-label" for="agree_checkbox_user"><?php echo (!empty($user_language[$user_selected]['lg_agree'])) ? $user_language[$user_selected]['lg_agree'] : $default_language['en']['lg_agree']; ?> <?=settingValue('website_name')?></label> <a tabindex="-1" href="javascript:void(0);"><?php echo (!empty($user_language[$user_selected]['lg_login'])) ? $user_language[$user_selected]['lg_login'] : $default_language['en']['lg_login']; ?></a> &amp; <a tabindex="-1" href="javascript:void(0);"> Terms.</a>
 									</div>
 								</div>
 								<div class="form-group">
-									<button id="registration_submit_user" type="submit" class="login-btn btn">Register</button>
+									<button id="registration_submit_user" type="submit" class="login-btn btn"><?php echo (!empty($user_language[$user_selected]['lg_Register'])) ? $user_language[$user_selected]['lg_Register'] : $default_language['en']['lg_Register']; ?></button>
 								</div>
 								<div class="account-footer text-center">
-									Already have an account? <a href="javascript:void(0);" data-dismiss="modal" data-toggle="modal" data-target="#tab_login_modal">Login</a>
+								<?php echo (!empty($user_language[$user_selected]['Already_Have_An_Account_lg'])) ? $user_language[$user_selected]['Already_Have_An_Account_lg'] : $default_language['en']['Already_Have_An_Account_lg']; ?> <a href="javascript:void(0);" data-dismiss="modal" data-toggle="modal" data-target="#tab_login_modal"><?php echo (!empty($user_language[$user_selected]['lg_login'])) ? $user_language[$user_selected]['lg_login'] : $default_language['en']['lg_login']; ?></a>
 								</div>
 							</form> 
 						</div>
@@ -438,218 +516,126 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 	</div>
 </div>
 
+
+<div class="modal account-modal fade multi-step" id="modal-wizardreset" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header p-0 border-0">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="header-content-blk text-center">
+				<div class="alert alert-success text-center" id="flash_succ_message2" ></div>
+			</div> 
+			<div class="modal-body step-1" data-step="1">
+
+				<div class="account-content">
+					<div class="account-box">
+						<div class="login-right">
+							<div class="login-header">
+								<h3><?php echo (!empty($user_language[$user_selected]['Forget_Password_lg'])) ? $user_language[$user_selected]['Forget_Password_lg'] : $default_language['en']['Forget_Password_lg']; ?> </h3>
+								<p class="text-muted"><?php echo (!empty($user_language[$user_selected]['Reset_Email_ID_lG'])) ? $user_language[$user_selected]['Reset_Email_ID_lG'] : $default_language['en']['Reset_Email_ID_lG']; ?></p>
+							</div> 
+
+							<form method='post' id="forgetpwddiv">
+								<div class="form-group">
+									<label><?php echo (!empty($user_language[$user_selected]['Email_ID_lg'])) ? $user_language[$user_selected]['Email_ID_lg'] : $default_language['en']['Email_ID_lg']; ?></label>
+									<input type="text" name="login_mode1" id="login_mode1" value="1">
+									<input type="hidden" class="form-control" name="userLogintype" id='user_logintype' value="<?=$login_type?>" >
+									<input type="text" class="form-control" name="forgot_mailid" id='forgot_mailid'>
+								</div>
+								<div class="form-group">
+									<button id="forgotpwdmail" type="submit" class="login-btn btn">><?php echo (!empty($user_language[$user_selected]['lg_Submit'])) ? $user_language[$user_selected]['lg_Submit'] : $default_language['en']['lg_Submit']; ?></button>
+								</div>
+								
+							</form> 
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="modal-body step-2" data-step="2">
+				<div class="login-header">
+					<h3>OTP</h3>
+					<p class="text-muted">Verification your account</p>
+				</div>
+				<form action="<?php echo base_url()?>user/login/send_otp_request_user" method='post' id="new_fourth_page_user">
+					<div class="form-group">
+						<input type="hidden" class="form-control form-control-lg" placeholder="Mobile Number" name='enteredMobile' id='enteredMobiles'>
+					</div>
+					<div class="form-group">
+						<div class="alert alert-success text-center" role="alert">
+							<strong>We Have Send SMS Via OTP</strong>
+							<strong>Please Check Your Registered Mobile Number </strong>
+						</div>
+						<?php if(settingValue('default_otp')==1){ ?>
+						<div class="alert alert-danger text-center" role="alert">
+							We have used default otp for demo purpose.<br> <strong>Default OTP 1234</strong>
+						</div>
+					<?php }?>
+						<input type="text" class="form-control form-control-lg no_only" autocomplete="off" maxlength="4" minlength="4" placeholder="Enter OTP Here.." name="otp_number" id='otp_number_user'>
+						<span for='otp_number' id='otp_error_msg'></span>
+					</div>
+					
+					<p class="resend-otp">Didn't receive the OTP? <a href="#" id="re_send_otp_user"> Resend OTP</a></p>
+					<div>
+						<button id='registration_final' type="submit" class="login-btn" >Enter</button>
+					</div>
+					<div>
+						<button id='registration_resend' type="button" class="invisible login-btn" >Resend</button>
+					</div>
+				</form> 
+			</div>
+		</div>
+	</div>
+</div>
+
 <footer class="footer">
-	<?php 
-	$query = $this->db->query("select * from system_settings WHERE status = 1");
-	$result = $query->result_array();
-	$stripe_option='1';
-	$publishable_key='';
-	$live_publishable_key='';
-	$logo_front='';
-	foreach ($result as $res) {
-		if($res['key'] == 'stripe_option'){
-			$stripe_option = $res['value'];
-		} 
-		if($res['key'] == 'publishable_key'){
-			$publishable_key = $res['value'];
-		} 
-		if($res['key'] == 'live_publishable_key'){
-			$live_publishable_key = $res['value'];
-		} 
-
-		if($res['key'] == 'logo_front'){
-			$logo_front = $res['value'];
-		}
-
-	}
-
-	if($stripe_option==1){
-		$stripe_key= $publishable_key;
-	}else{
-		$stripe_key= $live_publishable_key;
-	}
-
-	if(!empty($logo_front)){
-		$web_log=base_url().$logo_front;
-	}else{
-		$web_log=base_url().'assets/img/logo.png';
-	}
-
-	?>
-
-	<input type="hidden" id="stripe_key" value="<?=$stripe_key;?>">
-	<input type="hidden" id="logo_front" value="<?=$web_log;?>">
-
-	<!-- Footer Top -->
-	<div class="footer-top">
-		<div class="container">
-			<div class="row">
-
-				<div class="col-lg-3 col-md-6">
-					
-					<!-- Footer Widget -->
-					<div class="footer-widget footer-menu">
-						<h2 class="footer-title">Quick Links  </h2>
-						<ul>
-							<li><a href="<?php echo base_url()?>faq">Faq</a></li>
-							<li><a href="<?php echo base_url()?>help">Help</a></li>
-							<?php
-							if(empty($this->session->userdata('id'))){ ?>
-								<li><a href="javascript:void(0);" data-toggle="modal" data-target="#modal-wizard">Create Account</a></li>
-							<?php }
-							?> 
-							<li><a href="<?php echo base_url()?>contact">Contact Us</a></li>
-						</ul>
-					</div>
-					<!-- /Footer Widget -->
-
-				</div>
-
-				<div class="col-lg-3 col-md-6">
-					
-					<!-- Footer Widget -->
-					<div class="footer-widget footer-menu">
-						<h2 class="footer-title">Categories</h2>
-						<?php 
-
-						$this->db->select('*');
-						$this->db->from('categories');
-						$this->db->where('status',1);
-						$this->db->order_by('id','DESC');
-						$this->db->limit(5);
-						$result = $this->db->get()->result_array();
-
-						?>
-						<ul>
-							<?php foreach ($result as $res) { ?>
-								<li><a href="<?php echo base_url();?>search/<?php echo str_replace(' ', '-', $res['category_name']);?>"><?php echo ucfirst($res['category_name']);?></a></li>
-							<?php } ?>
-						</ul>
-					</div>
-					<!-- /Footer Widget -->
-
-				</div>
-
-				<div class="col-lg-3 col-md-6">
-					
-					<!-- Footer Widget -->
-					<div class="footer-widget footer-contact">
-						<h2 class="footer-title">Contact Us</h2>
-						<div class="footer-contact-info">
-							<div class="footer-address">
-								<span><i class="far fa-building"></i></span>
-								<p>
-									<?php $query = $this->db->query("select * from system_settings WHERE status = 1");
-									$result = $query->result_array();
-
-									foreach ($result as $res) {
-										if($res['key'] == 'contact_details'){
-											$contact_details = $res['value'];
-											echo ''.$contact_details.'';
-										} }?>
-									</p>
-								</div>
-								<p>
-									<i class="fas fa-headphones"></i>
-									<?php $query = $this->db->query("select * from system_settings WHERE status = 1");
-									$result = $query->result_array();
-
-									foreach ($result as $res) {
-										if($res['key'] == 'mobile_number'){
-											$mobile_number = $res['value'];
-											echo ''.$mobile_number.'';
-										} }?>
-									</p>
-									<p class="mb-0">
-										<i class="fas fa-envelope"></i>
-										<?php $query = $this->db->query("select * from system_settings WHERE status = 1");
-										$result = $query->result_array();
-
-										foreach ($result as $res) {
-											if($res['key'] == 'email_address'){
-												$email_address = $res['value'];
-												echo ''.$email_address.'';
-											} }?>
-										</p>
-									</div>
-								</div>
-								<!-- /Footer Widget -->
-
-							</div>
-							<div class="col-lg-3 col-md-6">
-
-								<!-- Footer Widget -->
-								<div class="footer-widget">
-									<h2 class="footer-title">Follow Us</h2>
-									<div class="social-icon">
-										<ul>
-											<li>
-												<a href="#" target="_blank"><i class="fab fa-facebook-f"></i> </a>
-											</li>
-											<li>
-												<a href="#" target="_blank"><i class="fab fa-twitter"></i> </a>
-											</li>
-											<li>
-												<a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
-											</li>
-											<li>
-												<a href="#" target="_blank"><i class="fab fa-google"></i></a>
-											</li>
-										</ul>
-									</div>
-								</div>
-								<!-- /Footer Widget -->
-
-							</div>
-
-						</div>
-					</div>
-				</div>
-				<!-- /Footer Top -->
-
-				<!-- Footer Bottom -->
-				<div class="footer-bottom">
-					<div class="container">
-
-						<!-- Copyright -->
-						<div class="copyright">
-							<div class="row">
-								<div class="col-md-6 col-lg-6">
-									<div class="copyright-text">
-										<p class="mb-0">&copy; <?php echo date('Y').' '.$this->website_name;?></p>
-									</div>
-								</div>
-								<div class="col-md-6 col-lg-6">
-
-									<!-- Copyright Menu -->
-									<div class="copyright-menu">
-										<ul class="policy-menu">
-											<li><a href="<?php echo base_url()?>terms-conditions">Terms and Conditions</a></li>
-											<li><a href="<?php echo base_url()?>privacy">Privacy</a></li>
-										</ul>
-									</div>
-									<!-- /Copyright Menu -->
-
-								</div>
-							</div>
-						</div>
-						<!-- /Copyright -->
-
-					</div>
-				</div>
-				<!-- /Footer Bottom -->
-
-			</footer>
+	
+ <div class="footer-dark">
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-md-3 item">
+                        <h3><?php echo (!empty($user_language[$user_selected]['lg_contact'])) ? $user_language[$user_selected]['lg_contact'] : $default_language['en']['lg_contact']; ?></h3>
+                        <ul>
+                            <li><a href="#"><?php echo (!empty($user_language[$user_selected]['lg_footer_Mail'])) ? $user_language[$user_selected]['lg_footer_Mail'] : $default_language['en']['lg_footer_Mail']; ?></a></li>
+                            <li><a href="#"><?php echo (!empty($user_language[$user_selected]['lg_footer_tel'])) ? $user_language[$user_selected]['lg_footer_tel'] : $default_language['en']['lg_footer_tel']; ?></a></li>
+                            <li><a href="#"><?php echo (!empty($user_language[$user_selected]['lg_footer_adress'])) ? $user_language[$user_selected]['lg_footer_adress'] : $default_language['en']['lg_footer_adress']; ?></a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-6 col-md-3 item">
+                        <h3><?php echo (!empty($user_language[$user_selected]['lg_about'])) ? $user_language[$user_selected]['lg_about'] : $default_language['en']['lg_about']; ?></h3>
+                        <ul>
+                            <li><a href="http://nawwa.tn/about-us"><?php echo (!empty($user_language[$user_selected]['lg_FAQ'])) ? $user_language[$user_selected]['lg_FAQ'] : $default_language['en']['lg_FAQ']; ?></a></li>
+                            <li><a href="http://nawwa.tn/terms-conditions"><?php echo (!empty($user_language[$user_selected]['lg_Terms'])) ? $user_language[$user_selected]['lg_Terms'] : $default_language['en']['lg_Terms']; ?></a></li>
+           
+                        <li><a href="http://nawwa.tn/privacy"><?php echo (!empty($user_language[$user_selected]['lg_Privacy'])) ? $user_language[$user_selected]['lg_Privacy'] : $default_language['en']['lg_Privacy']; ?></a></li>
+                           
+                        </ul>
+                    </div>
+                    <div class="col-md-6 item text">
+                        <h3><?php echo (!empty($user_language[$user_selected]['lg_nawwa'])) ? $user_language[$user_selected]['lg_nawwa'] : $default_language['en']['lg_nawwa']; ?></h3>
+                        <p><?php echo (!empty($user_language[$user_selected]['lg_footer_description'])) ? $user_language[$user_selected]['lg_footer_description'] : $default_language['en']['lg_footer_description']; ?></p>
+                    </div>
+                
+                    <div class="col item social"><a href="#"><i class="icon ion-social-facebook"></i></a><a href="#"><i class="icon ion-social-twitter"></i></a><a href="#"><i class="icon ion-social-snapchat"></i></a><a href="#"><i class="icon ion-social-instagram"></i></a></div>
+                </div>
+                <p class="copyright">Nawwa © 2021</p>
+            </div>
+        </footer>
+    </div>
+</footer>
 		</div>
 		<input type="hidden" id="base_url" value="<?php echo $base_url; ?>">
+		<input type="hidden" id="site_name" value="<?php echo $this->website_name;?>">
 		<input type="hidden" id="csrf_token" value="<?php echo $this->security->get_csrf_hash(); ?>">
 		<input type="hidden" id="csrfName" value="<?php echo $this->security->get_csrf_token_name(); ?>">
 		<input type="hidden" id="csrfHash" value="<?php echo $this->security->get_csrf_hash(); ?>">
-		
 		<script src="<?php echo $base_url; ?>assets/js/moment.min.js"></script>
 		<script src="<?php echo $base_url; ?>assets/js/bootstrap-datetimepicker.min.js"></script>
 		<script src="<?php echo base_url();?>assets/js/popper.min.js"></script>
-
 		<script src="<?php echo base_url();?>assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 		<script src="<?php echo base_url();?>assets/js/sweetalert.min.js"></script>
 		<script src="<?php echo base_url();?>assets/plugins/datatables/datatables.min.js"></script>
@@ -664,11 +650,9 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 		<script src="<?php echo base_url();?>assets/plugins/toaster/toastr.min.js"></script>
 		<script src="<?php echo base_url();?>assets/plugins/owlcarousel/owl.carousel.min.js"></script>
 		<script src="<?php echo base_url();?>assets/plugins/jquery-ui/jquery-ui.min.js"></script>
-		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDzviwvvZ_S6Y1wS6_b3siJWtSJ5uFQHoc&v=3.exp&libraries=places"></script>
-		
+		<script src="https://maps.googleapis.com/maps/api/js?key=<?=$map_key?>&v=3.exp&libraries=places"></script> 
 		<input type="hidden" id="modules_page" value="<?php echo $module;?>">
 		<input type="hidden" id="current_page" value="<?php echo $this->uri->segment(1);?>">
-	
 		<?php
 		$edit_service=$this->uri->segment(1).'/'.$this->uri->segment(2).'/'.$this->uri->segment(3);
 		if($this->uri->segment(1)!='add-service'|| $edit_service!='user/service/edit_service'&&$this->uri->segment(1)!='update_booking'&&$this->uri->segment(1)!='update_booking'){?>
@@ -738,8 +722,14 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 		<?php if($this->uri->segment(1)=="user-settings"){ ?>
 			<script src="<?php echo base_url(); ?>assets/js/user_settings.js"></script>
 		<?php }?>
-		<?php if($this->uri->segment(1)=="user-wallet"){ ?>
+		<?php if($this->uri->segment(1)=="user-wallet" || $this->uri->segment(1)=="provider-subscription"){ ?>
 			<script src="<?php echo base_url(); ?>assets/js/user_wallet.js"></script>
+			<script src="https://www.paypalobjects.com/api/checkout.js"></script>
+			<!-- Load the client component. -->
+			<script src="https://js.braintreegateway.com/web/3.60.0/js/client.min.js"></script>
+			<!-- Load the PayPal Checkout component. -->
+			<script src="https://js.braintreegateway.com/web/3.60.0/js/paypal-checkout.min.js"></script>
+			
 		<?php }?>
 		<?php if($this->uri->segment(1)=="edit_service"){ ?>
 			<script src="<?php echo $base_url; ?>assets/js/edit_service.js"></script>
@@ -752,7 +742,117 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 		<?php }?>
 		<!---External js end-->
 
-		<div class="modal account-modal fade" id="tab_login_modal">
+		<?php
+$type = $this->session->userdata('usertype');
+$userId = $this->session->userdata('id');
+$default_language = default_language();
+$active_language = active_language();
+
+if ($this->session->userdata('user_select_language') == '') {
+
+    $lang = $default_language['language_value'];
+} else {
+    $lang = $this->session->userdata('user_select_language');
+}
+?>
+<?php
+$default_language_select = default_language();
+
+if ($this->session->userdata('user_select_language') == '') {
+
+    if ($default_language_select['tag'] == 'rtl') {
+        
+        echo'<script src="' . base_url() . 'assets/js/app-rtl.js"></script>';
+    }
+} else {
+    if ($this->session->userdata('tag') == 'rtl') {
+
+        echo'<script src="' . base_url() . 'assets/js/app-rtl.js"></script>';
+    }
+}
+?>
+
+<?php 
+if($login_type=='email'){
+?>
+
+
+<div class="modal account-modal fade" id="tab_login_modal" data-keyboard="false" data-backdrop="static">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header p-0 border-0">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="alert alert-danger text-center"  id="flash_error_message1" ></div>
+						<div id="login_form_div">
+						<div class="account-content">
+								<div class="account-box">
+									<div class="login-right">
+										<div class="login-header">
+											<h3><?php echo (!empty($user_language[$user_selected]['lg_login'])) ? $user_language[$user_selected]['lg_login'] : $default_language['en']['lg_login']; ?> </h3>
+											<p class="text-muted"><?php echo (!empty($user_language[$user_selected]['Access_to_our_lg'])) ? $user_language[$user_selected]['Access_to_our_lg'] : $default_language['en']['Access_to_our_lg']; ?> <?=settingValue('website_name')?></p>
+										</div>
+										<div class="form-group">
+											<label><?php echo (!empty($user_language[$user_selected]['Email_ID_lg'])) ? $user_language[$user_selected]['Email_ID_lg'] : $default_language['en']['Email_ID_lg']; ?>Email ID</label>
+											<div class="row">
+												<div class="col-12">
+													<input type="hidden" name="login_mode" id="login_mode" value="1">
+													<input type="hidden" name="csrf_token_name" value="<?php echo $this->security->get_csrf_hash(); ?>" id="login_csrf">
+													<input class="form-control login_email" type="text" name="login_email" id="login_email" placeholder="<?php echo (!empty($user_language[$user_selected]['lg_footer_Mail'])) ? $user_language[$user_selected]['lg_footer_Mail'] : $default_language['en']['lg_footer_Mail']; ?>Enter EMail ID" >
+													<span id="mailid_error"></span>
+												</div>
+											</div>
+										</div>
+										<button class="login-btn" id="emaillogin_submit" type="submit"><?php echo (!empty($user_language[$user_selected]['lg_footer_Mail'])) ? $user_language[$user_selected]['lg_footer_Mail'] : $default_language['en']['lg_footer_Mail']; ?>Login</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="step-2" data-step="2" id="otp_final_div" >
+							<div class="login-header">
+								<h3><?php echo (!empty($user_language[$user_selected]['lg_footer_Mail'])) ? $user_language[$user_selected]['lg_footer_Mail'] : $default_language['en']['lg_footer_Mail']; ?>Password</h3>
+								<p class="text-muted"><?php echo (!empty($user_language[$user_selected]['lg_footer_Mail'])) ? $user_language[$user_selected]['lg_footer_Mail'] : $default_language['en']['lg_footer_Mail']; ?>Verification your account</p>
+							</div>
+							<div class="form-group">
+								<input type="hidden" name="" id="login_email_hide">
+								<input type="hidden" name="" id="login_mode_hide">
+								<input type="hidden" name="csrf_token_name" value="<?php echo $this->security->get_csrf_hash(); ?>" id="fp_csrf">
+							</div>
+							<div class="form-group">
+								<!--<div class="alert alert-success text-center" role="alert">
+									<strong>We Have Send SMS Via OTP</strong>
+									<strong>Please Check Your Registered Mobile Number </strong>
+								</div>-->
+							
+								<input type="password" class="form-control form-control-lg" autocomplete="off"  placeholder="Enter Password Here.." name="login_password" id='login_password'>
+								<span for='otp_number' id='otp_error_msg_login'></span>
+							</div>
+							<!--<p class="user_forgot_pwd">Forgot Password ? <a href="#" data-toggle="modal" data-target="#modal-wizardreset" data-dismiss="modal" aria-label="Close" id="user_forgot_pwd"> Click to Reset</a></p>-->
+							<p class="user_forgot_pwd"><?php echo (!empty($user_language[$user_selected]['lg_footer_Mail'])) ? $user_language[$user_selected]['lg_footer_Mail'] : $default_language['en']['lg_footer_Mail']; ?>Forgot Password ? <a href="#"  id="user_forgot_pwd"><?php echo (!empty($user_language[$user_selected]['lg_footer_Mail'])) ? $user_language[$user_selected]['lg_footer_Mail'] : $default_language['en']['lg_footer_Mail']; ?> Click to Get Link</a></p>
+							<span id="err_respwd"></span>
+							<div>
+								<button id='emailregistration_finals' type="button" class="login-btn" ><?php echo (!empty($user_language[$user_selected]['lg_footer_Mail'])) ? $user_language[$user_selected]['lg_footer_Mail'] : $default_language['en']['lg_footer_Mail']; ?>Enter</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+
+										
+										
+										
+										
+
+<?php }else{ ?>
+		<div class="modal account-modal fade" id="tab_login_modal" data-keyboard="false" data-backdrop="static">
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-header p-0 border-0">
@@ -768,7 +868,7 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 									<div class="login-right">
 										<div class="login-header">
 											<h3>Login</h3>
-											<p class="text-muted">Access to our Truelysell</p>
+											<p class="text-muted">Access to our <?=settingValue('website_name')?></p>
 										</div>
 										<div class="form-group">
 											<label>Mobile Number</label>
@@ -779,7 +879,7 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 													<select name="countryCode" id="login_country_code" class="form-control login_country_code">
 														<?php
 														foreach ($country_list as $key => $country) { 
-															if($country['country_id']=='216'){$select='selected';}else{ $select='';} ?>
+															if($country['country_id']=='91'){$select='selected';}else{ $select='';} ?>
 															<option <?=$select;?> data-countryCode="<?=$country['country_code'];?>" value="<?=$country['country_id'];?>"><?=$country['country_name'];?></option>
 														<?php } ?>
 													</select>
@@ -828,6 +928,7 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 				</div>
 			</div>
 		</div>
+<?php } ?>
 
 		<!-- Cancel Modal -->
 		<div id="cancelModal" class="modal fade" role="dialog">
@@ -860,6 +961,62 @@ $country_list=$this->db->where('status',1)->order_by('country_name',"ASC")->get(
 	$this->session->unset_userdata('error_message');
 	$this->session->unset_userdata('success_message');
 	?>
+<script src="assets/js/observers.js" defer></script>
+<script>
+  AOS.init();
+</script>
 	</body>
 
 	</html>
+        
+        <script>
+            function change_language(e){
+        var lg =  $(e).attr('lang');
+        var tag =  $(e).attr('lang_tag'); 
+        
+        var csrf_token = $('#csrf_lang').val();
+        
+//        alert(csrf_token);
+        
+      	$.post(
+      		'<?php echo base_url(); ?>admin/language/change_language',
+      		{
+      			lg:lg,
+      			tag:tag,
+                        csrf_token_name: csrf_token
+      		},
+      		function(res){
+           location.reload();
+        })    
+
+  	}
+        
+        function user_currency(code){
+            
+      if(code!=""){
+          
+          var csrf_token = $('#csrf_lang').val();
+        $.ajax({
+           type:'POST',
+           url: '<?php echo base_url(); ?>ajax/add_user_currency',
+           data :  {code:code,csrf_token_name: csrf_token},
+           dataType:'json',
+           success:function(response)
+           {  
+             if(response.success)
+             {
+                 
+               location.reload();
+           }
+           else {
+               
+            location.reload();
+        }
+    }
+});
+    }
+}
+        
+        
+            </script>
+

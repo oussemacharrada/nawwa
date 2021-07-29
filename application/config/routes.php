@@ -51,13 +51,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 $route['default_controller'] = 'home';
 $route['admin'] = 'admin/login';
+$route['forgot_password'] = 'admin/login/forgot_password';
 $route['dashboard'] = 'admin/dashboard';
 $route['map'] = 'admin/dashboard/map_list';
 $route['map_lists'] = 'admin/dashboard/service_map_list';
 $route['admin-profile'] = 'admin/profile';
 $route['admin/logout'] = 'admin/login/logout';
-$route['admin/wallet'] = 'admin/wallet';
-$route['admin/wallet-history'] = 'admin/wallet/wallet_history';
+// $route['admin/wallet'] = 'admin/wallet';
+// $route['admin/wallet-history'] = 'admin/wallet/wallet_history';
 /*booking report*/
 $route['admin/total-report'] = 'admin/Booking/total_bookings';
 $route['admin/pending-report'] = 'admin/Booking/pending_bookings';
@@ -71,11 +72,32 @@ $route['pay-reject'] = 'admin/Booking/update_reject_payment';
 $route['admin-notification'] = 'admin/Dashboard/admin_notification';
 
 
+//admin users
+$route['adminusers'] = 'admin/dashboard/adminusers';
+$route['adminusers/edit']='admin/dashboard/edit_adminusers';
+$route['adminusers/edit/(:num)']='admin/dashboard/edit_adminusers/$1';
+$route['adminuser-details/(:num)'] = 'admin/dashboard/adminuser_details/$1';
+$route['adminusers_list'] = 'admin/dashboard/adminusers_list';
+
+//
+
+
+//email template 
+$route['emailtemplate'] = 'admin/emailtemplate';
+$route['edit-emailtemplate/(:num)'] = 'admin/emailtemplate/edit/$1';
+
+//
 
 /* Settings*/
+$route['admin/fb_social_media'] = 'admin/settings/fb_social_media';
+$route['admin/googleplus_social_media'] = 'admin/settings/googleplus_social_media';
+$route['admin/twit_social_media'] = 'admin/settings/twit_social_media';
 $route['admin/emailsettings'] = 'admin/settings/emailsettings';
 $route['admin/sms-settings'] = 'admin/settings/smssettings';
 $route['admin/stripe_payment_gateway'] = 'admin/settings/stripe_payment_gateway';
+$route['admin/razorpay_payment_gateway'] = 'admin/settings/razorpay_payment_gateway';
+$route['admin/paypal_payment_gateway'] = 'admin/settings/paypal_payment_gateway';
+$route['admin/paytabs_payment_gateway'] = 'admin/settings/paytabs_payment_gateway';
 
 
 $route['users'] = 'admin/dashboard/users';
@@ -125,6 +147,7 @@ $route['admin/provider_list'] = 'admin/service/provider_list';
 $route['payment_list'] = 'admin/payments/payment_list';
 $route['admin-payment/(:any)'] = 'admin/payments/admin_payment/$1';
 $route['service-details/(:num)'] = 'admin/service/service_details/$1';
+$route['contact-details/(:num)'] = 'admin/contact/contact_details/$1';
 
 /*web*/
 
@@ -138,6 +161,7 @@ $route['search'] = 'home/services';
 $route['about-us'] = 'user/about/about_us';
 $route['terms-conditions'] = 'user/terms/terms';
 $route['contact'] = 'user/contact/contact';
+$route['pages/(:any)'] = 'home/pages/$1';
 $route['search/(:any)'] = 'home/services/$1';
 $route['privacy'] = 'user/privacy/privacy';
 $route['faq'] = 'user/privacy/faq';
@@ -161,7 +185,10 @@ $route['book-service/(:any)']='user/service/book_service/$1';
 $route['user-dashboard']='user/service/user_dashboard';
 $route['provider-dashboard']='user/service/provider_dashboard';
 $route['user-settings']='user/dashboard/user_settings';
-$route['user-wallet']='user/dashboard/user_wallet';
+$route['change-password']='user/dashboard/userchangepassword';
+$route['provider-change-password']='user/dashboard/prochangepassword';
+// $route['user-wallet']='user/dashboard/user_wallet';
+$route['paytab_payment']='user/dashboard/paytab_payment';//user/dashboard/paytab_payment
 $route['user-payment']='user/dashboard/user_payment';
 $route['user-accountdetails']='user/dashboard/user_accountdetails';
 $route['user-reviews']='user/dashboard/user_reviews';
@@ -171,7 +198,7 @@ $route['booking-details-user/(:any)']='user/service/booking_details_user/$1';
 
 $route['provider-bookings']='user/dashboard/provider_bookings';
 $route['provider-settings']='user/dashboard/provider_settings';
-$route['provider-wallet']='user/dashboard/provider_wallet';
+// $route['provider-wallet']='user/dashboard/provider_wallet';
 $route['provider-payment']='user/dashboard/provider_payment';
 $route['provider-subscription']='user/dashboard/provider_subscription';
 $route['provider-availability']='user/dashboard/provider_availability';
@@ -179,6 +206,11 @@ $route['provider-accountdetails']='user/dashboard/provider_accountdetails';
 $route['create_availability']='user/dashboard/create_availability';
 $route['user-bookings']='user/dashboard/user_bookings';
 $route['logout']='user/login/logout';
+
+/*
+ * Multiple Languages
+ */
+$route['language']='admin/language';
 
 /*api*/
 
@@ -245,6 +277,10 @@ $route['api/rate_review'] = 'api/api/rate_review';
 $route['api/review_type'] = 'api/api/review_type'; 
 $route['api/update_booking'] = 'api/api/update_booking';
 $route['api/generate_otp_provider'] = 'api/api/generate_otp_provider';
+$route['api/check_provider_email'] = 'api/api/check_provider_email';
+$route['api/check_user_emailid'] = 'api/api/check_user_emailid';
+$route['api/forget_password'] = 'api/api/forget_password';
+$route['api/userchangepassword'] = 'api/api/userchangepassword';
 $route['api/generate_otp_user'] = 'api/api/generate_otp_user';
 $route['api/stripe_account_details'] = 'api/api/stripe_account_details';
 $route['api/details'] = 'api/api/details';
@@ -255,14 +291,51 @@ $route['api/update-myservice-status'] = 'api/api/update_myservice_status';
 $route['api/chat_storage'] = 'api/api/insert_message';
 $route['api/get-chat-list'] = 'api/api/get_chat_list';
 $route['api/get-chat-history'] = 'api/api/get_chat_history';
-$route['api/get-wallet'] = 'api/api/get_wallet_amt';
-$route['api/add-user-wallet'] = 'api/api/add_user_wallet';
-$route['api/withdraw-provider'] = 'api/api/provider_wallet_withdrawal';
+// $route['api/get-wallet'] = 'api/api/get_wallet_amt';
+// $route['api/add-user-wallet'] = 'api/api/add_user_wallet';
+// $route['api/withdraw-provider'] = 'api/api/provider_wallet_withdrawal';
 $route['api/customer-card-list'] = 'api/api/get_customer_saved_card';
-$route['api/wallet-history'] = 'api/api/wallet_history';
+// $route['api/wallet-history'] = 'api/api/wallet_history';
 $route['api/stripe_details'] = 'api/api/stripe_details';
 $route['api/provider-card-info'] = 'api/api/provider_card_info';
 
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+//Add Multiple Language
+$route['language'] = 'admin/language';
+$route['add-language'] = 'admin/language/AddLanguages';
+$route['insert-language'] = 'admin/language/InsertLanguage';
+$route['update_language'] = 'admin/language/update_language_status';
+//Add Wep Keywords
+$route['wep_language'] = 'admin/language/wep_language';
+$route['add-wep-keyword'] = 'admin/language/AddWepKeyword';
+$route['insert_web_keyword'] = 'admin/language/InsertWepKeyword';
+$route['update_multi_web_language'] = 'admin/language/update_multi_web_language/';
+$route['language_web_list'] = 'admin/language/language_web_list';
+//App Keyword
+$route['app_page_list'] = 'admin/language/AppPageList';
+$route['app_page_list/(:any)'] = 'admin/language/pages_language';
+$route['add-app-keyword'] = 'admin/language/AddAPPKeyword';
+$route['insert_app_keyword'] = 'admin/language/InsertAppKeyword';
+$route['language_list'] = 'admin/language/language_list';
+//$route['app-keyword-add'] = 'admin/language/AllAPPKeyword';
+$route['insertApp'] = 'admin/language/AppKeyword';
+$route['app-keyword-add/(:any)'] = 'admin/language/AllAPPKeyword';
+
+
+$route['Revenue'] = 'admin/Revenue';
+
+$route['paypal_braintree'] = 'user/paypal/braintree';
+
+
+$route['admin/theme-color'] = 'admin/Settings/ThemeColorChange';
+$route['Change_color'] = 'admin/Settings/ChangeColor';
+
+
+
+
+
+
+

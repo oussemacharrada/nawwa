@@ -32,13 +32,13 @@
 			 $stripe = array();
 
        
-			 $stripe['tokenid'] = $inputs['token'];
-			 $stripe['payment_details'] = $inputs['args'];
+                 $stripe['tokenid'] = $inputs['token'];
+                 $stripe['payment_details'] = $inputs['args'];
 	         $stripe['service_id'] = $inputs['service_id'];
 	         $stripe['provider_id'] = $inputs['provider_id'];
 	         $stripe['user_id'] = $inputs['user_id'];
 	         $stripe['amount'] = $inputs['amount'];
-	         $stripe['currency_code'] = settings('currency');
+	         $stripe['currency_code'] = $inputs['currency_code'];
 	         $stripe['service_date'] = $inputs['service_date'];
 	         $stripe['location'] = $inputs['location'];
 	         $stripe['latitude'] = $inputs['latitude'];
@@ -46,10 +46,10 @@
 	         $stripe['notes'] = $inputs['notes'];
 	         $stripe['from_time'] = $inputs['from_time'];
 	         $stripe['to_time'] = $inputs['to_time'];
-	         $stripe['request_date'] = utc_date_conversion(date('Y-m-d H:i:s'));
-        	 $stripe['request_time'] =  utc_date_conversion(date('H:i:s'));
-        	 $stripe['updated_on']  = utc_date_conversion(date('Y-m-d H:i:s'));
-	         
+	         $stripe['request_date'] = (date('Y-m-d H:i:s'));
+        	 $stripe['request_time'] =  (date('H:i:s'));
+        	 $stripe['updated_on']  = (date('Y-m-d H:i:s'));
+                
 			  $this->db->insert('book_service', $stripe);
 			  return $this->db->insert_id();
 

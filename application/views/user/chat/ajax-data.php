@@ -40,10 +40,11 @@
 
 					<?php } }else{ ?>
 					<div class="notificationlist">
-						<p class="text-center text-danger mt-3">Notification Empty</p>
+						<p class="text-center text-danger mt-3"><?php echo (!empty($user_language[$user_selected]['lg_notification_empty'])) ? $user_language[$user_selected]['lg_notification_empty'] : $default_language['en']['lg_notification_empty']; ?></p>
 					</div>
 				   <?php } ?>
 				   <?php 
 					if(!empty($notification_list)){
 						echo $this->ajax_pagination->create_links();
 					} ?>
+					<script src="<?php echo base_url();?>assets/js/functions.js"></script>

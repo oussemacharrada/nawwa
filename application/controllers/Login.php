@@ -15,6 +15,7 @@ class Login extends CI_Controller {
 
 
         parent::__construct();
+        error_reporting(0);
 
         $this->load->helper('custom_language');
 
@@ -38,6 +39,28 @@ class Login extends CI_Controller {
         $this->data['subscription_details'] = get_subscription_details(md5($user_id));
 
 
+        $default_language_select = default_language();
+
+        if ($this->session->userdata('user_select_language') == '') {
+            $this->data['user_selected'] = $default_language_select['language_value'];
+        } else {
+            $this->data['user_selected'] = $this->session->userdata('user_select_language');
+        }
+
+        $this->data['active_language'] = $active_lang = active_language();
+
+        $lg = custom_language($this->data['user_selected']);
+
+        $this->data['default_language'] = $lg['default_lang'];
+
+        $this->data['user_language'] = $lg['user_lang'];
+
+        $this->user_selected = (!empty($this->data['user_selected'])) ? $this->data['user_selected'] : 'en';
+
+        $this->default_language = (!empty($this->data['default_language'])) ? $this->data['default_language'] : '';
+
+        $this->user_language = (!empty($this->data['user_language'])) ? $this->data['user_language'] : '';
+        
 
     }
 

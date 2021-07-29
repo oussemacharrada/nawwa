@@ -21,6 +21,12 @@
 			$rating = $this->db->get()->row_array();
 			$avg_rating = round($rating['AVG(rating)'],1);
 			$service_amount = $srows['service_amount'];
+			$userId = $this->session->userdata('id');
+			If (empty($userId)) {
+			$user_currency_code = settings('currency');
+			$service_currency_code = $srows['currency_code'];
+			$service_amount = get_gigs_currency($srows['service_amount'], $srows['currency_code'], $user_currency_code);
+			}
 			$serviceimages=$this->db->where('service_id',$srows['id'])->get('services_image')->row_array();
 			
 			

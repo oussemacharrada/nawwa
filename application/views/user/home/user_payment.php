@@ -1,3 +1,19 @@
+<div class="breadcrumb-bar">
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<div class="breadcrumb-title">
+				</div>
+			</div>
+			<div class="col-auto float-right ml-auto breadcrumb-menu">
+				<nav aria-label="breadcrumb" class="page-breadcrumb">
+					<ol class="breadcrumb">
+						</ol>
+				</nav>
+			</div>
+		</div>
+	</div>
+</div>
 <div class="content">
 	<div class="container">
 		<div class="row">
@@ -5,7 +21,7 @@
 		 
 			<div class="col-xl-9 col-md-8">
 			
-				<h4 class="widget-title">Payment History</h4>
+				<h4 class="widget-title"><?php echo (!empty($user_language[$user_selected]['lg_Payment_History'])) ? $user_language[$user_selected]['lg_Payment_History'] : $default_language['en']['lg_Payment_History']; ?></h4>
 				<div class="card transaction-table mb-0">
 					<div class="card-body">
 						<div class="table-responsive">
@@ -17,17 +33,18 @@
 								<?php }?>
 								<thead>
 									<tr>
-										<th>Service</th>
-										<th>Provider</th>
-										<th>Date</th>
-										<th>Amount</th>
-										<th>Status</th>
+										<th><?php echo (!empty($user_language[$user_selected]['lg_Service'])) ? $user_language[$user_selected]['lg_Service'] : $default_language['en']['lg_Service']; ?></th>
+										<th><?php echo (!empty($user_language[$user_selected]['lg_Customer'])) ? $user_language[$user_selected]['lg_Customer'] : $default_language['en']['lg_Customer']; ?></th>
+										<th><?php echo (!empty($user_language[$user_selected]['lg_Date'])) ? $user_language[$user_selected]['lg_Date'] : $default_language['en']['lg_Date']; ?></th>
+										<th><?php echo (!empty($user_language[$user_selected]['lg_Amount'])) ? $user_language[$user_selected]['lg_Amount'] : $default_language['en']['lg_Amount']; ?></th>
+										<th><?php echo (!empty($user_language[$user_selected]['lg_Status'])) ? $user_language[$user_selected]['lg_Status'] : $default_language['en']['lg_Status']; ?></th>
 									</tr>
 								</thead>
 								<tbody>
 
 									<?php
 									if(count($services)>0){
+										$user_details = $this->db->where('id', $this->session->userdata('id'))->get('users')->row_array();
 										$service_images='';
 									 foreach($services as $row){ 
 									   $amount_refund=''; 
@@ -38,6 +55,9 @@
                                           $amount_refund="Amount refund to Provider";
 									 	}
 									 }
+									 $user_currency = settings('currency');
+                                     $user_currency_code =  settings('currency');
+									$service_amount = get_gigs_currency($row["amount"],  settings('currency'),  settings('currency'));
 
 									 	if(!empty($row['service_image'])){
 
@@ -63,18 +83,18 @@
 										<td>
 											<img class="avatar-xs rounded-circle" src="<?php echo base_url().$row['profile_img'];?>" alt=""> <?=$row['name'];?>
 										</td>
-										<td><?=date('d M Y H:i',strtotime($row['service_date']));?></td>
-										<td><strong><?=currency_conversion(settings('currency')).$row['amount'];?></strong></td>
+										<td><?=date('d M Y',strtotime($row['service_date']));?></td>
+										<td><strong><?=currency_conversion($user_currency_code).$service_amount;?></strong></td>
 										<td>
 											<?php if(!empty($row['reject_paid_token'])){ ?>
 												<span class="badge bg-success-light"><?=$amount_refund;?></span>
 
 										<?php } if($row['booking_status']==6){?>
-											<span class="badge bg-success-light">Payment Completed</span>
+											<span class="badge bg-success-light"><?php echo (!empty($user_language[$user_selected]['lg_Payment_Completed'])) ? $user_language[$user_selected]['lg_Payment_Completed'] : $default_language['en']['lg_Payment_Completed']; ?></span>
 										<?php }else if($row['booking_status']==5&&empty($row['reject_paid_token'])){?>
-											<span class="badge bg-danger-light">User Rejected</span>
+											<span class="badge bg-danger-light"><?php echo (!empty($user_language[$user_selected]['lg_Use_Rejected'])) ? $user_language[$user_selected]['lg_Use_Rejected'] : $default_language['en']['lg_Use_Rejected']; ?></span>
 										<?php }else if($row['booking_status']==7&&empty($row['reject_paid_token'])){?>
-                                            <span class="badge bg-danger-light">Provider Cancelled</span>
+                                            <span class="badge bg-danger-light"><?php echo (!empty($user_language[$user_selected]['lg_Provider_Rejected'])) ? $user_language[$user_selected]['lg_Provider_Rejected'] : $default_language['en']['lg_Provider_Rejected']; ?></span>
 										<?php }?>
 										</td>
 									</tr>

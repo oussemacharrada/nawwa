@@ -167,8 +167,8 @@
 			$(".err_check").each(function(){
 				if ($(this).prop('checked')==true){ 
 					t_val+=Number($(this).val());
-					$('.eachdayfromtime'+id).val('00:00 AM');
-					$('.eachdaytotime'+id).val('11:30 PM');
+					$('.eachdayfromtime'+id).val('');
+					$('.eachdaytotime'+id).val('');
 				}
 
 				if(t_val==0){

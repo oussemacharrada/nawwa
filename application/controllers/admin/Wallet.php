@@ -10,6 +10,7 @@ class Wallet extends CI_Controller {
         parent::__construct();
         $this->load->model('service_model','service');
         $this->load->model('wallet_model','wallet');
+		  $this->load->model('common_model','common_model');
         $this->data['theme'] = 'admin';
         $this->data['model'] = 'wallet';
         $this->data['base_url'] = base_url();
@@ -21,7 +22,7 @@ class Wallet extends CI_Controller {
 
 	public function index()
 	{
-
+  $this->common_model->checkAdminUserPermission(10);
     if(!empty($this->input->post())){
       $token=$this->input->post('token');
       $from=$this->input->post('from');
@@ -48,6 +49,7 @@ class Wallet extends CI_Controller {
 	}
 
   public function wallet_history() {
+	    $this->common_model->checkAdminUserPermission(10);
     if(!empty($this->input->post())){
          $token=$this->input->post('token');
       $from=$this->input->post('from');

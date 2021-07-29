@@ -126,7 +126,7 @@ var notes='';
               from_time: {
                 validators: {
                   notEmpty: {
-                    message: 'Please select category...'
+                    message: 'Please select Time Slot...'
                   }
                 }
               },

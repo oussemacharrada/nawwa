@@ -1,4 +1,19 @@
-
+<div class="breadcrumb-bar">
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<div class="breadcrumb-title">
+				</div>
+			</div>
+			<div class="col-auto float-right ml-auto breadcrumb-menu">
+				<nav aria-label="breadcrumb" class="page-breadcrumb">
+					<ol class="breadcrumb">
+						</ol>
+				</nav>
+			</div>
+		</div>
+	</div>
+</div>
 <div class="content">
 	<div class="container">
 		<div class="row">
@@ -37,6 +52,14 @@
 								<h5><a href=""><?php echo $review_list['service_title']?></a></h5>
 								<div class="review-date"><?php echo $datetime->format('F d, Y H:i a');?></div>
 								<p><?php echo $review_list['review']?></p>
+								<div class="review-user">
+									<?php if($review_list['profile_img'] == '') { ?>
+										<img class="avatar-xs rounded-circle" src="<?php echo base_url();?>assets/img/user.jpg" alt="">  
+									<?php } else {?>
+										<img class="avatar-xs rounded-circle" src="<?php echo base_url().$review_list['profile_img']?>" alt=""> 
+									<?php } ?>
+									<?php echo $review_list['name']?>
+								</div>
 							</div>
 							<div class="review-count">
 								<div class="rating">

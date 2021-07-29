@@ -149,6 +149,7 @@ Version      : 1.0
 	
 	if($('.images-carousel').length > 0 ){
 		$('.images-carousel').owlCarousel({
+			rtl: true,
 			loop: true,
 			center: true,
 			margin: 10,
@@ -162,7 +163,6 @@ Version      : 1.0
 				},
 				1000: {
 					items: 1,
-					loop: false,
 					margin: 20
 				}
 			}

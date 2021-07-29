@@ -9,6 +9,7 @@ class Ratingstype extends CI_Controller {
 
         parent::__construct();
         $this->load->model('service_model','service');
+		$this->load->model('common_model','common_model');
         $this->data['theme'] = 'admin';
         $this->data['model'] = 'ratingstype';
         $this->data['base_url'] = base_url();
@@ -26,6 +27,7 @@ class Ratingstype extends CI_Controller {
   /*delete comments*/
 
   public function delete_comment(){
+	  $this->common_model->checkAdminUserPermission(8);
     $id=$this->input->post('id');
 
             
@@ -45,6 +47,7 @@ class Ratingstype extends CI_Controller {
   }
 	public function ratingstype()
 	{
+		$this->common_model->checkAdminUserPermission(7);
     if($this->session->userdata('admin_id'))
 		{
   		$this->data['page'] = 'ratingstype';
@@ -63,6 +66,7 @@ class Ratingstype extends CI_Controller {
 
     public function review_report()
   {
+	  $this->common_model->checkAdminUserPermission(8);
     if($this->session->userdata('admin_id'))
     {
 
@@ -107,6 +111,7 @@ class Ratingstype extends CI_Controller {
 
 	public function add_ratingstype()
 	{
+		$this->common_model->checkAdminUserPermission(7);
     if($this->session->userdata('admin_id'))
 		{
 
@@ -147,6 +152,7 @@ class Ratingstype extends CI_Controller {
 
   public function edit_ratingstype($id)
   {
+	  $this->common_model->checkAdminUserPermission(7);
     if($this->session->userdata('admin_id'))
     {
 
@@ -220,6 +226,7 @@ class Ratingstype extends CI_Controller {
 
   public function delete_ratingstype()
   {
+	  $this->common_model->checkAdminUserPermission(7);
     $id=$this->input->post('id');
     $this->db->where('id',$id);
     if($this->db->delete('rating_type'))

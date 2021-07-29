@@ -8,12 +8,16 @@ class Subscription extends CI_Controller {
    public function __construct() {
 
         parent::__construct();
+        error_reporting(0);
                   if(empty($this->session->userdata('id'))){
           redirect(base_url());
           }
         $this->data['theme'] = 'user';
         $this->data['model'] = 'home';
         $this->data['base_url'] = base_url();
+		
+		 $this->load->library('paypal_lib');
+		 
 
 			  $this->load->helper('custom_language');
         $this->load->model('subscription_model','subscription');
@@ -133,6 +137,90 @@ class Subscription extends CI_Controller {
   	$this->load->vars($this->data);
   	$this->load->view($this->data['theme'].'/template');
 	}
+	
+	
+	
+	
+	public function razorpay_payment(){
+    $inputs = array();
+    $sub_id = $this->input->post('sub_id'); // Package ID
+    //$records = $this->subscription->get_subscription($sub_id);
+    $inputs['subscription_id'] = $sub_id;
+    $inputs['user_id'] = $this->session->userdata('id');
+	$inputs['token']=$this->session->userdata('chat_token');
+	$inputs['payment_details']='Razorpay';
+	//echo json_encode($inputs);exit;
+	//echo "<pre>";print_r($inputs);exit;
+    // $inputs['token'] = $this->input->post('tokenid');
+
+     // $charges_array = array();
+     // $amount = (!empty($records['fee']))?$records['fee']:2;
+     // $amount = ($amount *100);
+     // $charges_array['amount']       = $amount;
+     // $charges_array['currency']     = settings('currency');
+     // $charges_array['description']  = (!empty($records['subscription_name']))?$records['subscription_name']:'Subscription';
+     // $charges_array['source']       = 'tok_visa';
+
+
+     // $result = $this->stripe->stripe_charges($charges_array);
+
+     
+     // $result = json_decode($result,true);
+     
+        // $inputs['token'] = $result['id'];
+        // $inputs['args'] = json_encode($result);
+    $result = $this->subscription->razorpay_subscription_success($inputs);
+    if($result){
+        $data=array('tab_ctrl'=>2,'success_message'=>'You have been subscribed successfully');
+
+
+                   $this->session->set_flashdata($data);
+                    $token=$this->session->userdata('chat_token');
+       $this->send_push_notification($token,$this->session->userdata('id'),1,' have been subscribed'); 
+          }else{
+             $data=array('tab_ctrl'=>2,'success_message'=>'Sorry, something went wrong');
+
+                   $this->session->set_flashdata($data);
+    }
+      
+    echo json_encode($result);
+  }
+  
+  
+  	public function paypal_payment($sub_id){
+		
+		// $input = $this->input->post();
+		// $paypalInfo = $this->input->get();
+		// 
+		// echo "<pre>";print_r($paypalInfo);exit;
+		
+		$inputs = array();
+    //$sub_id = $this->input->get('sub_id'); // Package ID
+    //$records = $this->subscription->get_subscription($sub_id);
+    $inputs['subscription_id'] = $sub_id;
+    $inputs['user_id'] = $this->session->userdata('id');
+	$inputs['token']=$this->session->userdata('chat_token');
+	$inputs['payment_details']='Paypal';
+	//echo "<pre>";print_r($inputs);exit;
+	 $result = $this->subscription->paypal_subscription_success($inputs);
+    if($result){
+        $data=array('tab_ctrl'=>2,'success_message'=>'You have been subscribed successfully');
+
+
+                   $this->session->set_flashdata($data);
+                    $token=$this->session->userdata('chat_token');
+       $this->send_push_notification($token,$this->session->userdata('id'),1,' have been subscribed'); 
+	   redirect(base_url('provider-subscription'));
+          }else{
+             $data=array('tab_ctrl'=>2,'success_message'=>'Sorry, something went wrong');
+
+                   $this->session->set_flashdata($data);
+				   redirect(base_url('provider-subscription'));
+    }
+      
+    echo json_encode($result);
+	
+  }
 
   public function stripe_payment(){
     $inputs = array();
@@ -146,7 +234,7 @@ class Subscription extends CI_Controller {
      $amount = (!empty($records['fee']))?$records['fee']:2;
      $amount = ($amount *100);
      $charges_array['amount']       = $amount;
-     $charges_array['currency']     = 'MYR';
+     $charges_array['currency']     = settings('currency');
      $charges_array['description']  = (!empty($records['subscription_name']))?$records['subscription_name']:'Subscription';
      $charges_array['source']       = 'tok_visa';
 

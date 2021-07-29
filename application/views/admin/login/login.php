@@ -22,7 +22,9 @@
 			<div class="login-right-wrap">
 				<div class="account-header">
 					<div class="account-logo text-center mb-4">
-						<a href="<?php echo $base_url."admin"; ?>"><img src="<?php echo base_url();?>assets/img/logo-icon.png" alt="" width="50"></a>
+						<a href="<?php echo $base_url."admin"; ?>">
+							<img src="<?php echo $base_url; ?>assets/img/logo-icon.png" alt="" class="img-fluid">
+						</a>
 					</div>
 				</div>
 				<div class="login-header">
@@ -47,6 +49,10 @@
 					<div class="form-group mb-4">
 						<label class="control-label">Password</label>
 						<input class="form-control" type="password" name="password" id="password" placeholder="Enter your password">
+					</div>
+					
+					<div class="form-group mb-4">
+						<a href="<?php echo $base_url; ?>forgot_password" class="btn btn-info btn-sm" >Forgot Password?</a>
 					</div>
 					<div class="text-center">
 						<button class="btn btn-primary btn-block account-btn" id="loginSubmit" type="button">Login</button>

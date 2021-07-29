@@ -185,15 +185,19 @@
       (document.getElementById('service_location')), {
         types: ['geocode']
       });
+	  
+	 
 
-    google.maps.event.addDomListener(document.getElementById('service_location'), 'focus', geolocate);
+    google.maps.event.addDomListener(document.getElementById('service_location'), 'focus', geolocate);//alert('sdfds');
     autocomplete.addListener('place_changed', get_latitude_longitude);
+	
   }
 
   function get_latitude_longitude() {
         // Get the place details from the autocomplete object.
         var place = autocomplete.getPlace();
-        var key = "AIzaSyDzviwvvZ_S6Y1wS6_b3siJWtSJ5uFQHoc";
+		 var key = $("#map_key").val();//alert(map_key);
+        //var key = "AIzaSyAKuTyrOQ7v-xjPXQUcP7pOJn6vSnDCCF8";
         $.get('https://maps.googleapis.com/maps/api/geocode/json',{address:place.formatted_address,key:key},function(data, status){
 
           $(data.results).each(function(key,value){
@@ -203,7 +207,7 @@
             $('#service_longitude').val(value.geometry.location.lng);
 
 
-          });
+          });    
         });
       }
 
